@@ -39,15 +39,15 @@ const Login = () => {
 
   useEffect(() => {
     setErrMsg("");
+    setErrors([]);
   }, [user, password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // try {
     await validate().then(async (res) => {});
-    try {
-      resetUser();
-      setPassword("");
-    } catch (err) {}
+
+    // } catch (err) {}
   };
 
   const content = (
