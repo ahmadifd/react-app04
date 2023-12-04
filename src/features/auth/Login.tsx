@@ -4,8 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import usePersist from "../../hooks/usePersist";
 import * as yup from "yup";
 import getError from "../../utilities/getError";
+import { useLoginMutation } from "./authApiSlice";
 
 const Login = () => {
+  const [login] = useLoginMutation();
+
   const userRef = useRef<HTMLInputElement>(null!);
 
   const [user, resetUser, userAttribs] = useInput("user", "");
@@ -44,10 +47,13 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // try {
     await validate().then(async (res) => {});
-
-    // } catch (err) {}
+    try {
+      const result = await login({ username: user, password });
+      console.log(result);
+    } catch (err) {
+      //console.log(err);
+    }
   };
 
   const content = (
