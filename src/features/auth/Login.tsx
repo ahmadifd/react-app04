@@ -1,13 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useInput from "../../hooks/useInput";
 import { useEffect, useRef, useState } from "react";
 import usePersist from "../../hooks/usePersist";
 import * as yup from "yup";
 import getError from "../../utilities/getError";
 import { useLoginMutation } from "./authApiSlice";
+import { setCredentials } from "./authSlice";
+import { useAppDispatch } from "../../app/store";
 
 const Login = () => {
-  const [login] = useLoginMutation();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate()
+  
+  const [login, { isLoading }] = useLoginMutation();
 
   const userRef = useRef<HTMLInputElement>(null!);
 
@@ -23,16 +28,21 @@ const Login = () => {
   const handleToggle = () => setPersist((prev: boolean) => !prev);
 
   let schema = yup.object().shape({
-    user: yup.string().required(),
+    username: yup.string().required(),
     password: yup.string().required(),
   });
 
   async function validate() {
     try {
-      await schema.validate({ user, password }, { abortEarly: false });
+      await schema.validate(
+        { username: user, password },
+        { abortEarly: false }
+      );
       setErrors([]);
+      return true;
     } catch (err) {
       setErrors(getError(err));
+      return false;
     }
   }
 
@@ -40,81 +50,106 @@ const Login = () => {
     userRef.current.focus();
   }, []);
 
-  useEffect(() => {
-    setErrMsg("");
-    setErrors([]);
-  }, [user, password]);
+  useEffect(() => {}, [user, password]);
+
+  interface jsonResult {
+    status: Number;
+    data: {
+      message: string;
+      data: {};
+    };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await validate().then(async (res) => {});
+    const isValid = await validate();
     try {
-      const result = await login({ username: user, password });
-      console.log(result);
-    } catch (err) {
-      //console.log(err);
+      if (isValid) {
+        setErrMsg("");
+        const { accessToken } = await login({
+          username: user,
+          password,
+        }).unwrap();
+        dispatch(setCredentials({ token: accessToken }));
+        navigate('/home')
+      }
+    } catch (error) {
+      const err = error as jsonResult;
+      if (!err.status) {
+        setErrMsg("No Server Response");
+      } else if (err.status === 401) {
+        setErrMsg("Unauthorized");
+      } else {
+        setErrMsg(err.data?.message);
+      }
+    } finally {
+      if (isValid) {
+        setPassword("");
+      }
     }
   };
+
+  if (isLoading) return <h1>...isLoading</h1>;
 
   const content = (
     <div className="container">
       <div>
-        <div>Login-Header</div>
-        <div>
-          {errMsg && (
-            <div className="alert alert-danger">
-              <p>{errMsg}</p>
-            </div>
-          )}
+        {errMsg && <div className="alert alert-danger">{errMsg}</div>}
 
-          {errors && errors.length > 0 && (
-            <div className="alert alert-danger">
-              {errors.map((e, i) => {
-                return <li key={i}>{e}</li>;
-              })}
-            </div>
-          )}
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="username">Username:</label>
-              <input
-                type="text"
-                {...userAttribs}
-                id="username"
-                className="form-control"
-                autoComplete="off"
-                ref={userRef}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
-              <input
-                type="password"
-                id="password"
-                className="form-control"
-                onChange={handlePwdInput}
-              />
-            </div>
-            <div>
-              <button className="btn btn-primary">Sign In</button>
-              <label htmlFor="persist">
-                <input
-                  type="checkbox"
-                  id="persist"
-                  onChange={handleToggle}
-                  checked={persist}
-                />
-                Trust This Device
-              </label>
-            </div>
-          </form>
-        </div>
-        <div>
-          <div>
-            Login-Footer
-            <Link to="/"> Back to Home</Link>
+        {errors && errors.length > 0 && (
+          <div className="alert alert-danger">
+            {errors.map((e, i) => {
+              return <li key={i}>{e}</li>;
+            })}
           </div>
-        </div>
+        )}
+      </div>
+      <div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username:</label>
+            <input
+              type="text"
+              {...userAttribs}
+              id="username"
+              className="form-control"
+              autoComplete="off"
+              ref={userRef}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
+            <input
+              type="password"
+              id="password"
+              className="form-control"
+              onChange={handlePwdInput}
+            />
+          </div>
+          <div>
+            <button className="btn btn-primary">Sign In</button>
+            <label htmlFor="persist">
+              <input
+                type="checkbox"
+                id="persist"
+                onChange={handleToggle}
+                checked={persist}
+              />
+              Trust This Device
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <Link to="/"> Back to Home</Link>
+        <p>
+          Need an Account?
+          <br />
+          <span className="line">
+            <Link to="/register">Sign Up</Link>
+          </span>
+        </p>
       </div>
     </div>
   );
