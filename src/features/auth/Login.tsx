@@ -74,8 +74,8 @@ const Login = () => {
         setErrMsg("No Server Response");
       } else if (err.status === 401) {
         setErrMsg("Unauthorized");
-      } else if (err.data?.message) {
-        setErrMsg(err.data?.message);
+      } else {
+        setErrMsg(JSON.stringify(err));
       }
     } finally {
       if (isValid) {

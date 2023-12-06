@@ -1,5 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import { logOut, setCredentials } from "./authSlice";
+import { jsonResult } from "../../utilities/jsonResult";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -45,11 +46,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
       },
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          const result = (await queryFulfilled) as {
-            data: { data: {} };
-          };
-          console.log("token", result.data.data);
-          //dispatch(setCredentials({ token: result.data.accessToken }));
+          const result = (await queryFulfilled) as jsonResult
+          console.log("token", result.data?.data.accessToken);
+          dispatch(setCredentials({ token: result.data?.data.accessToken! }));
         } catch (err) {
           console.log(err);
         }
