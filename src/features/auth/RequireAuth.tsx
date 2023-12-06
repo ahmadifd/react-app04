@@ -10,17 +10,12 @@ const RequireAuth: FC<IProps> = ({ allowedRoles }) => {
   const location = useLocation();
   const { roles } = useAuth();
 
-  // const content = roles.some((role) => allowedRoles.includes(role)) ? (
-  //   <Outlet />
-  // ) : (
-  //   <Navigate to="/login" state={{ from: location }} replace />
-  // );
+  const content = roles.some((role) => allowedRoles.includes(role)) ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 
-  useEffect(() => {
-    console.log('RequireAuth',roles);
-  },[roles]);
-
-  const content = <Outlet />;
   return content;
 };
 
