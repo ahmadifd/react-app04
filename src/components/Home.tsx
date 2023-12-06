@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../app/store";
-import { logOut } from "../features/auth/authSlice";
+import { useSendLogoutMutation } from "../features/auth/authApiSlice";
 
 const Home = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+
+  const [sendLogout] = useSendLogoutMutation();
 
   const signOut = async () => {
-    dispatch(logOut());
+    await sendLogout(null);
     navigate("/");
   };
 

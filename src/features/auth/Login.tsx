@@ -7,11 +7,12 @@ import getError from "../../utilities/getError";
 import { useLoginMutation } from "./authApiSlice";
 import { setCredentials } from "./authSlice";
 import { useAppDispatch } from "../../app/store";
+import { jsonResult } from "../../utilities/jsonResult";
 
 const Login = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   const [login, { isLoading }] = useLoginMutation();
 
   const userRef = useRef<HTMLInputElement>(null!);
@@ -52,26 +53,20 @@ const Login = () => {
 
   useEffect(() => {}, [user, password]);
 
-  interface jsonResult {
-    status: Number;
-    data: {
-      message: string;
-      data: {};
-    };
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = await validate();
     try {
       if (isValid) {
         setErrMsg("");
-        const { accessToken } = await login({
+        const {
+          data: { accessToken },
+        } = await login({
           username: user,
           password,
         }).unwrap();
         dispatch(setCredentials({ token: accessToken }));
-        navigate('/home')
+        navigate("/home");
       }
     } catch (error) {
       const err = error as jsonResult;
@@ -79,7 +74,7 @@ const Login = () => {
         setErrMsg("No Server Response");
       } else if (err.status === 401) {
         setErrMsg("Unauthorized");
-      } else {
+      } else if (err.data?.message) {
         setErrMsg(err.data?.message);
       }
     } finally {
