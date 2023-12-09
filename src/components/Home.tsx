@@ -1,26 +1,17 @@
-import { useNavigate } from "react-router-dom";
-import { useSendLogoutMutation } from "../features/auth/authApiSlice";
+import { Navigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const Home = () => {
-  const navigate = useNavigate();
-
-  const [sendLogout] = useSendLogoutMutation();
-
-  const signOut = async () => {
-    await sendLogout(null);
-    navigate("/");
-  };
+  const { isManager, isAdmin } = useAuth();
 
   return (
     <>
       <div className="container">
-        <h1>Home</h1>
-        <br />
-        <p>You are logged in!</p>
-        <br />
-        <button className="btn btn-danger" onClick={signOut}>
-          Sign Out
-        </button>
+        {isManager || isAdmin ? (
+          <Navigate to="/dash" />
+        ) : (
+          <Navigate to="/shopping" />
+        )}
       </div>
     </>
   );

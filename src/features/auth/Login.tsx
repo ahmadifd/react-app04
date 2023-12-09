@@ -7,13 +7,8 @@ import getError from "../../utilities/getError";
 import { useLoginMutation } from "./authApiSlice";
 import { setCredentials } from "./authSlice";
 import { useAppDispatch } from "../../app/store";
-import { jsonResult } from "../../utilities/jsonResult";
-import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
-
-  const { username, isManager, isAdmin  } = useAuth();
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -71,10 +66,10 @@ const Login = () => {
         }).unwrap();
         dispatch(setCredentials({ token: accessToken }));
 
-        //navigate("/dash");
+        navigate("/home");
       }
     } catch (error) {
-      const err = error as jsonResult;
+      const err = error as { status: number };
       if (!err.status) {
         setErrMsg("No Server Response");
       } else if (err.status === 401) {

@@ -4,7 +4,6 @@ import { useAppSelector } from "../../app/store";
 import { selectCurrentToken } from "./authSlice";
 import { useEffect, useState } from "react";
 import { useRefreshMutation } from "./authApiSlice";
-import { jsonResult } from "../../utilities/jsonResult";
 
 const PersistLogin = () => {
   const [persist] = usePersist();
@@ -29,7 +28,7 @@ const PersistLogin = () => {
     content = (
       <div className="container">
         <div className="alert alert-danger">
-          {`${(error as jsonResult)?.data?.message} - `}
+          {`${(error as { data: { message: number } }).data.message} - `}
           <Link to="/login">Please login again</Link>.
         </div>
       </div>

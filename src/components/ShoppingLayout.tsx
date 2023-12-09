@@ -1,7 +1,7 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import {  Outlet, useNavigate } from "react-router-dom";
 import { useSendLogoutMutation } from "../features/auth/authApiSlice";
 
-const DashLayout = () => {
+const ShoppingLayout = () => {
   const navigate = useNavigate();
 
   const [sendLogout] = useSendLogoutMutation();
@@ -26,4 +26,4 @@ const DashLayout = () => {
     </>
   );
 };
-export default DashLayout;
+export default ShoppingLayout;
