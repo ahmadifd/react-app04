@@ -8,6 +8,9 @@ import PersistLogin from "./features/auth/PersistLogin";
 import RequireAuth from "./features/auth/RequireAuth";
 import { ROLES } from "./config/roles";
 import Prefetch from "./features/auth/Prefetch";
+import Welcome from "./features/auth/Welcome";
+import DashLayout from "./components/DashLayout";
+import ShopLayout from "./components/ShopLayout";
 
 function App() {
   return (
@@ -21,7 +24,12 @@ function App() {
             element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
           >
             <Route element={<Prefetch />}>
-              <Route path="home" element={<Home />} />
+              <Route path="dash" element={<DashLayout />}>
+                <Route index element={<Welcome />} />
+              </Route>
+              <Route path="shop" element={<ShopLayout />}>
+                <Route index element={<Home />} />
+              </Route>
             </Route>
           </Route>
         </Route>

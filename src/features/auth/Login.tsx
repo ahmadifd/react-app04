@@ -8,8 +8,12 @@ import { useLoginMutation } from "./authApiSlice";
 import { setCredentials } from "./authSlice";
 import { useAppDispatch } from "../../app/store";
 import { jsonResult } from "../../utilities/jsonResult";
+import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
+
+  const { username, isManager, isAdmin  } = useAuth();
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -66,7 +70,8 @@ const Login = () => {
           password,
         }).unwrap();
         dispatch(setCredentials({ token: accessToken }));
-        navigate("/home");
+
+        //navigate("/dash");
       }
     } catch (error) {
       const err = error as jsonResult;
