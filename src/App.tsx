@@ -65,6 +65,7 @@ import MuiBarChart from "./components/mui/MuiBarChart";
 import MuiPieChart from "./components/mui/MuiPieChart";
 import MuiScatterChart from "./components/mui/MuiScatterChart";
 import MuiDataGrid from "./components/mui/MuiDataGrid";
+import UserDataGrid from "./components/mui/UserDataGrid";
 
 function App() {
   return (
@@ -126,6 +127,7 @@ function App() {
         <Route path="pie" element={<MuiPieChart />} />
         <Route path="scatter" element={<MuiScatterChart />} />
         <Route path="datagrid" element={<MuiDataGrid />} />
+        <Route path="usergrid" element={<UserDataGrid />} />
         /////////////////////////////////////////////////////////////////////////////////
         <Route element={<PersistLogin />}>
           <Route
