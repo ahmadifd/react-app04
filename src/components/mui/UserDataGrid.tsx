@@ -8,6 +8,7 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridRowModes,
+  GridRowModesModel,
   GridRowSelectionModel,
   GridRowsProp,
   GridSortModel,
@@ -29,7 +30,7 @@ import {
 } from "@mui/x-data-grid";
 import MuiPagination from "@mui/material/Pagination";
 import { TablePaginationProps } from "@mui/material/TablePagination";
-import { GridDemoData } from "@mui/x-data-grid-generator";
+import { GridDemoData, randomId } from "@mui/x-data-grid-generator";
 import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
@@ -353,11 +354,11 @@ function EditToolbar(props: EditToolbarProps) {
   const { setRows, setRowModesModel } = props;
 
   const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [...oldRows, { id, name: "", age: "", isNew: true }]);
+     const id = randomId();
+    // setRows((oldRows) => [...oldRows, { id, name: "", age: "", isNew: true }]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "firstname" },
     }));
   };
 
