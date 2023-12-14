@@ -13,6 +13,7 @@ import {
   GridRowsProp,
   GridRowSelectionModel,
   GridRenderCellParams,
+  GridPagination,
 } from "@mui/x-data-grid";
 import {
   GridDemoData,
@@ -46,6 +47,15 @@ import {
 import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
 import SecurityIcon from "@mui/icons-material/Security";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
+import {
+  gridFilteredTopLevelRowCountSelector,
+  gridPageSizeSelector,
+  useGridApiContext,
+  useGridSelector,
+  useGridRootProps,
+} from "@mui/x-data-grid";
+import MuiPagination from "@mui/material/Pagination";
+import { TablePaginationProps } from "@mui/material/TablePagination";
 
 ///////////////////////////////////////////FilterDataGrid/////////////////////////////////////
 
@@ -254,7 +264,6 @@ function PagingDataGrid() {
       console.log("pageInfo", pageInfo);
       console.log("rows", rows);
       console.log("isLoading", isLoading);
-
     }
   }, [rows]);
 
@@ -818,6 +827,100 @@ function ColDefDataGrid() {
     </div>
   );
 }
+
+///////////////////////////////////////////custpageDataGrid/////////////////////////////////////
+
+const SERVER_OPTIONS = {
+  useCursorPagination: false,
+};
+
+const { useQuery, ...data } = createFakeServer({}, SERVER_OPTIONS);
+
+const getPageCount = (rowCount: number, pageSize: number): number => {
+  if (pageSize > 0 && rowCount > 0) {
+    return Math.ceil(rowCount / pageSize);
+  }
+
+  return 0;
+};
+
+function Pagination({
+  page,
+  onPageChange,
+  className,
+}: Pick<TablePaginationProps, "page" | "onPageChange" | "className">) {
+  const apiRef = useGridApiContext();
+  const rootProps = useGridRootProps();
+
+  const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
+  const visibleTopLevelRowCount = useGridSelector(
+    apiRef,
+    gridFilteredTopLevelRowCountSelector
+  );
+  const pageCount = getPageCount(
+    rootProps.rowCount ?? visibleTopLevelRowCount,
+    pageSize
+  );
+
+  return (
+    <MuiPagination
+      color="primary"
+      className={className}
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, newPage) => {
+        onPageChange(event as any, newPage - 1);
+      }}
+    />
+  );
+}
+
+function CustomPagination(props: any) {
+  return <GridPagination ActionsComponent={Pagination} {...props} />;
+}
+
+function CustpageDataGrid() {
+  const [paginationModel, setPaginationModel] = React.useState({
+    page: 0,
+    pageSize: 5,
+  });
+
+  const { isLoading, rows, pageInfo } = useQuery(paginationModel);
+
+  // Some API clients return undefined while loading
+  // Following lines are here to prevent `rowCountState` from being undefined during the loading
+  const [rowCountState, setRowCountState] = React.useState(
+    pageInfo?.totalRowCount || 0
+  );
+  React.useEffect(() => {
+    setRowCountState((prevRowCountState) =>
+      pageInfo?.totalRowCount !== undefined
+        ? pageInfo?.totalRowCount
+        : prevRowCountState
+    );
+  }, [pageInfo.totalRowCount, setRowCountState]);
+
+  console.log(rowCountState);
+
+  return (
+    <div style={{ height: 400, width: "100%" }}>
+      <DataGrid
+        rows={rows}
+        {...data}
+        rowCount={rowCountState}
+        loading={isLoading}
+        pageSizeOptions={[5]}
+        paginationModel={paginationModel}
+        paginationMode="server"
+        onPaginationModelChange={setPaginationModel}
+        slots={{
+          pagination: CustomPagination,
+        }}
+      />
+    </div>
+  );
+}
+
 ///////////////////////////////////////////MuiDataGrid/////////////////////////////////////
 
 const MuiDataGrid = () => {
@@ -825,11 +928,13 @@ const MuiDataGrid = () => {
     <>
       {/* <FilterDataGrid /> */}
       {/* <SortDataGrid /> */}
-      <PagingDataGrid />
+      {/* <PagingDataGrid /> */}
+      {/* <CustpageDataGrid /> */}
       {/* <ChkDataGrid /> */}
+
       {/* <EditDataGrid /> */}
       {/* <ColDataGrid/> */}
-      {/* <ColDefDataGrid /> */}
+      <ColDefDataGrid />
     </>
   );
 };

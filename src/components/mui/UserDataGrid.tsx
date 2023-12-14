@@ -1,12 +1,42 @@
 import {
   DataGrid,
+  GridActionsCellItem,
   GridColDef,
   GridFilterModel,
+  GridPagination,
   GridPaginationModel,
+  GridRenderCellParams,
   GridRowId,
+  GridRowModes,
+  GridRowSelectionModel,
+  GridRowsProp,
   GridSortModel,
+  GridToolbarContainer,
 } from "@mui/x-data-grid";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  gridFilteredTopLevelRowCountSelector,
+  gridPageSizeSelector,
+  useGridApiContext,
+  useGridSelector,
+  useGridRootProps,
+} from "@mui/x-data-grid";
+import MuiPagination from "@mui/material/Pagination";
+import { TablePaginationProps } from "@mui/material/TablePagination";
+import { GridDemoData } from "@mui/x-data-grid-generator";
+import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
 
 //////////////////////////////////////////////////////////////////
 interface UserType {
@@ -26,6 +56,7 @@ interface PageInfo {
   pageSize?: number;
 }
 
+type Row = (typeof UsersData)[number];
 const UsersData: UserType[] = [
   {
     id: 1,
@@ -145,21 +176,80 @@ interface KeyValue {
   value: string;
 }
 
+function RenderDate(props: GridRenderCellParams<any, Date>) {
+  const { hasFocus, value } = props;
+  const buttonElement = useRef<HTMLButtonElement>(null);
+  const rippleRef = useRef<TouchRippleActions>(null);
+
+  useLayoutEffect(() => {
+    if (hasFocus) {
+      const input = buttonElement.current!.querySelector("input");
+      input?.focus();
+    } else if (rippleRef.current) {
+      // Only available in @mui/material v5.4.1 or later
+      rippleRef.current.stop({} as any);
+    }
+  }, [hasFocus]);
+
+  return (
+    <strong>
+      <Button
+        ref={buttonElement}
+        touchRippleRef={rippleRef}
+        variant="contained"
+        size="small"
+        style={{ marginLeft: 16 }}
+        // Remove button from tab sequence when cell does not have focus
+        tabIndex={hasFocus ? 0 : -1}
+        onKeyDown={(event: React.KeyboardEvent) => {
+          if (event.key === " ") {
+            // Prevent key navigation when focus is on button
+            event.stopPropagation();
+          }
+        }}
+      >
+        Open
+      </Button>
+    </strong>
+  );
+}
 const useUsersApi = (pagesize: number) => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setisLoading] = useState<boolean>(false);
   const [next, setNext] = useState<number>();
   const [totalcount, setTotalCount] = useState<number>();
 
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 50 },
+  const deleteUser = useCallback(
+    (id: GridRowId) => () => {
+      setTimeout(() => {
+        //setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      });
+    },
+    []
+  );
+
+  const columns: GridColDef<Row>[] = [
+    { field: "id", headerName: "ID", width: 100, renderCell: RenderDate },
     { field: "_id", headerName: "_ID", width: 50 },
-    { field: "firstname", headerName: "FirstName", width: 100 },
+    { field: "firstname", headerName: "FirstName", width: 100,editable:true },
     { field: "lastname", headerName: "LastName", width: 100 },
     { field: "email", headerName: "Email", width: 100 },
     { field: "username", headerName: "Username", width: 100 },
     { field: "roles", headerName: "Roles", width: 100 },
     { field: "active", headerName: "Active", width: 60 },
+    {
+      field: "actions",
+      type: "actions",
+      width: 80,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={deleteUser(params.id)}
+          // showInMenu
+        />
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -185,8 +275,6 @@ const useUsersApi = (pagesize: number) => {
       }
     }
 
-    console.log(filterUsersData);
-
     setTimeout(() => {
       const fromindex = pagenumber * pagesize;
       if (filterUsersData.length >= fromindex + pagesize) {
@@ -206,15 +294,86 @@ const useUsersApi = (pagesize: number) => {
       setisLoading(false);
     }, 1000);
   }
-  return { rows: users, next, totalcount, columns, fetchUsers, isLoading };
+  return { datarows: users, next, totalcount, columns, fetchUsers, isLoading };
 };
 
 ///////////////////////////////////////////////////////////////////
 
+function CustomPagination(props: any) {
+  return <GridPagination ActionsComponent={Pagination} {...props} />;
+}
+
+const getPageCount = (rowCount: number, pageSize: number): number => {
+  if (pageSize > 0 && rowCount > 0) {
+    return Math.ceil(rowCount / pageSize);
+  }
+
+  return 0;
+};
+
+function Pagination({
+  page,
+  onPageChange,
+  className,
+}: Pick<TablePaginationProps, "page" | "onPageChange" | "className">) {
+  const apiRef = useGridApiContext();
+  const rootProps = useGridRootProps();
+
+  const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
+  const visibleTopLevelRowCount = useGridSelector(
+    apiRef,
+    gridFilteredTopLevelRowCountSelector
+  );
+  const pageCount = getPageCount(
+    rootProps.rowCount ?? visibleTopLevelRowCount,
+    pageSize
+  );
+
+  return (
+    <MuiPagination
+      color="primary"
+      className={className}
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, newPage) => {
+        onPageChange(event as any, newPage - 1);
+      }}
+    />
+  );
+}
+
+interface EditToolbarProps {
+  setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
+  setRowModesModel: (
+    newModel: (oldModel: GridRowModesModel) => GridRowModesModel
+  ) => void;
+}
+
+function EditToolbar(props: EditToolbarProps) {
+  const { setRows, setRowModesModel } = props;
+
+  const handleClick = () => {
+    const id = randomId();
+    setRows((oldRows) => [...oldRows, { id, name: "", age: "", isNew: true }]);
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+    }));
+  };
+
+  return (
+    <GridToolbarContainer>
+      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+        Add record
+      </Button>
+    </GridToolbarContainer>
+  );
+}
+
 const UserDataGrid = () => {
   const PAGE_SIZE = 5;
 
-  const { rows, columns, next, totalcount, fetchUsers, isLoading } =
+  const { datarows, columns, next, totalcount, fetchUsers, isLoading } =
     useUsersApi(PAGE_SIZE);
 
   const [pageInfo, setpageInfo] = useState<PageInfo>({});
@@ -227,6 +386,8 @@ const UserDataGrid = () => {
   });
   const [filter, setFilter] = useState<KeyValue | undefined>(undefined);
   const [sort, setSort] = useState<KeyValue | undefined>(undefined);
+  const [rowSelectionModel, setRowSelectionModel] =
+    useState<GridRowSelectionModel>([]);
 
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
 
@@ -236,7 +397,7 @@ const UserDataGrid = () => {
       nextCursor: next,
       pageSize: PAGE_SIZE,
     });
-  }, [rows, next]);
+  }, [datarows, next]);
 
   useEffect(() => {
     if (pageInfo?.nextCursor) {
@@ -261,12 +422,11 @@ const UserDataGrid = () => {
       mapPageToNextCursor.current[newPaginationModel.page - 1]
     ) {
       setPaginationModel(newPaginationModel);
-      fetchUsers(newPaginationModel.page, filter);
+      fetchUsers(newPaginationModel.page, filter, sort);
     }
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
-    // Here you save the data you need from the filter model
     if (filterModel.items && filterModel.items.length > 0) {
       if (
         filterModel.items[0].value != undefined &&
@@ -277,14 +437,14 @@ const UserDataGrid = () => {
           value: filterModel.items[0].value,
         };
         setFilter(result);
-        fetchUsers(paginationModel.page, result);
+        fetchUsers(paginationModel.page, result, sort);
       } else if (filter) {
         setFilter(undefined);
-        fetchUsers(paginationModel.page);
+        fetchUsers(paginationModel.page, undefined, sort);
       }
     } else if (filter) {
       setFilter(undefined);
-      fetchUsers(paginationModel.page);
+      fetchUsers(paginationModel.page, undefined, sort);
     }
   };
 
@@ -295,30 +455,39 @@ const UserDataGrid = () => {
         value: sortModel[0].sort!,
       };
       setSort(result);
-      fetchUsers(paginationModel.page, undefined, result);
-      console.log(result);
+      fetchUsers(paginationModel.page, filter, result);
     } else {
       setSort(undefined);
-      fetchUsers(paginationModel.page);
-      console.log(undefined);
+      fetchUsers(paginationModel.page, filter, undefined);
     }
   };
 
   return (
     <>
       <DataGrid
-        rows={rows}
+        rows={datarows}
         columns={columns}
         pageSizeOptions={[PAGE_SIZE]}
         rowCount={rowCountState}
         paginationMode="server"
         onPaginationModelChange={handlePaginationModelChange}
+        slots={{
+          pagination: CustomPagination,
+          toolbar: EditToolbar,
+        }}
+        checkboxSelection
         paginationModel={paginationModel}
         loading={isLoading}
         filterMode="server"
         onFilterModelChange={onFilterChange}
         sortingMode="server"
         onSortModelChange={handleSortModelChange}
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          console.log(datarows, newRowSelectionModel);
+          setRowSelectionModel(newRowSelectionModel);
+        }}
+        rowSelectionModel={rowSelectionModel}
+        keepNonExistentRowsSelected
       />
     </>
   );
