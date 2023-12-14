@@ -5,19 +5,17 @@ import {
   GridFilterModel,
   GridPagination,
   GridPaginationModel,
-  GridRenderCellParams,
   GridRowId,
-  GridRowModes,
   GridRowModesModel,
   GridRowSelectionModel,
   GridRowsProp,
   GridSortModel,
   GridToolbarContainer,
+  GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -30,14 +28,11 @@ import {
 } from "@mui/x-data-grid";
 import MuiPagination from "@mui/material/Pagination";
 import { TablePaginationProps } from "@mui/material/TablePagination";
-import { GridDemoData, randomId } from "@mui/x-data-grid-generator";
-import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
+import Box from '@mui/material/Box';
 
 //////////////////////////////////////////////////////////////////
 interface UserType {
@@ -177,81 +172,11 @@ interface KeyValue {
   value: string;
 }
 
-function RenderDate(props: GridRenderCellParams<any, Date>) {
-  const { hasFocus, value } = props;
-  const buttonElement = useRef<HTMLButtonElement>(null);
-  const rippleRef = useRef<TouchRippleActions>(null);
-
-  useLayoutEffect(() => {
-    if (hasFocus) {
-      const input = buttonElement.current!.querySelector("input");
-      input?.focus();
-    } else if (rippleRef.current) {
-      // Only available in @mui/material v5.4.1 or later
-      rippleRef.current.stop({} as any);
-    }
-  }, [hasFocus]);
-
-  return (
-    <strong>
-      <Button
-        ref={buttonElement}
-        touchRippleRef={rippleRef}
-        variant="contained"
-        size="small"
-        style={{ marginLeft: 16 }}
-        // Remove button from tab sequence when cell does not have focus
-        tabIndex={hasFocus ? 0 : -1}
-        onKeyDown={(event: React.KeyboardEvent) => {
-          if (event.key === " ") {
-            // Prevent key navigation when focus is on button
-            event.stopPropagation();
-          }
-        }}
-      >
-        Open
-      </Button>
-    </strong>
-  );
-}
 const useUsersApi = (pagesize: number) => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setisLoading] = useState<boolean>(false);
   const [next, setNext] = useState<number>();
   const [totalcount, setTotalCount] = useState<number>();
-
-  const deleteUser = useCallback(
-    (id: GridRowId) => () => {
-      setTimeout(() => {
-        //setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-      });
-    },
-    []
-  );
-
-  const columns: GridColDef<Row>[] = [
-    { field: "id", headerName: "ID", width: 100, renderCell: RenderDate },
-    { field: "_id", headerName: "_ID", width: 50 },
-    { field: "firstname", headerName: "FirstName", width: 100,editable:true },
-    { field: "lastname", headerName: "LastName", width: 100 },
-    { field: "email", headerName: "Email", width: 100 },
-    { field: "username", headerName: "Username", width: 100 },
-    { field: "roles", headerName: "Roles", width: 100 },
-    { field: "active", headerName: "Active", width: 60 },
-    {
-      field: "actions",
-      type: "actions",
-      width: 80,
-      getActions: (params) => [
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={deleteUser(params.id)}
-          // showInMenu
-        />
-      ],
-    },
-  ];
 
   useEffect(() => {
     fetchUsers(0);
@@ -295,7 +220,7 @@ const useUsersApi = (pagesize: number) => {
       setisLoading(false);
     }, 1000);
   }
-  return { datarows: users, next, totalcount, columns, fetchUsers, isLoading };
+  return { datarows: users, next, totalcount, fetchUsers, isLoading };
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -351,30 +276,82 @@ interface EditToolbarProps {
 }
 
 function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
-
   const handleClick = () => {
-     const id = randomId();
-    // setRows((oldRows) => [...oldRows, { id, name: "", age: "", isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "firstname" },
-    }));
+    console.log("Add record");
   };
 
   return (
-    <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
-      </Button>
-    </GridToolbarContainer>
+    <Box
+    sx={{
+      p: 0.5,
+      pb: 0,
+    }}
+  >
+      <GridToolbarContainer>
+        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+          Add record
+        </Button>
+      </GridToolbarContainer>
+      <GridToolbarQuickFilter
+        quickFilterParser={(searchInput: string) => {
+          console.log("QuickFilter");
+          return searchInput
+            .split(",")
+            .map((value) => value.trim())
+            .filter((value) => value !== "");
+        }}
+      />
+    </Box>
   );
 }
 
 const UserDataGrid = () => {
+  const deleteUser = useCallback(
+    (id: GridRowId) => () => {
+      console.log("deleteUser", id);
+    },
+    []
+  );
+  const editUser = useCallback(
+    (id: GridRowId) => () => {
+      console.log("editUser", id);
+    },
+    []
+  );
+
+  const columns: GridColDef<Row>[] = [
+    { field: "id", headerName: "ID", width: 100 },
+    { field: "_id", headerName: "_ID", width: 50 },
+    { field: "firstname", headerName: "FirstName", width: 100 },
+    { field: "lastname", headerName: "LastName", width: 100 },
+    { field: "email", headerName: "Email", width: 100 },
+    { field: "username", headerName: "Username", width: 100 },
+    { field: "roles", headerName: "Roles", width: 100 },
+    { field: "active", headerName: "Active", width: 60 },
+    {
+      field: "actions",
+      type: "actions",
+      width: 80,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={deleteUser(params.id)}
+          // showInMenu
+        />,
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={editUser(params.id)}
+          // showInMenu
+        />,
+      ],
+    },
+  ];
+
   const PAGE_SIZE = 5;
 
-  const { datarows, columns, next, totalcount, fetchUsers, isLoading } =
+  const { datarows, next, totalcount, fetchUsers, isLoading } =
     useUsersApi(PAGE_SIZE);
 
   const [pageInfo, setpageInfo] = useState<PageInfo>({});
@@ -476,6 +453,7 @@ const UserDataGrid = () => {
           pagination: CustomPagination,
           toolbar: EditToolbar,
         }}
+        slotProps={{ toolbar: { showQuickFilter: true } }}
         checkboxSelection
         paginationModel={paginationModel}
         loading={isLoading}
@@ -483,7 +461,9 @@ const UserDataGrid = () => {
         onFilterModelChange={onFilterChange}
         sortingMode="server"
         onSortModelChange={handleSortModelChange}
-        onRowSelectionModelChange={(newRowSelectionModel) => {
+        onRowSelectionModelChange={(
+          newRowSelectionModel: GridRowSelectionModel
+        ) => {
           console.log(datarows, newRowSelectionModel);
           setRowSelectionModel(newRowSelectionModel);
         }}
