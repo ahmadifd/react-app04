@@ -933,8 +933,8 @@ const MuiDataGrid = () => {
       {/* <ChkDataGrid /> */}
 
       {/* <EditDataGrid /> */}
-      {/* <ColDataGrid/> */}
-      <ColDefDataGrid />
+      <ColDataGrid/>
+      {/* <ColDefDataGrid /> */}
     </>
   );
 };

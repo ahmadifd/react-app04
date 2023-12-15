@@ -5,6 +5,7 @@ import {
   GridFilterModel,
   GridPagination,
   GridPaginationModel,
+  GridRenderCellParams,
   GridRowId,
   GridRowModesModel,
   GridRowSelectionModel,
@@ -16,6 +17,7 @@ import {
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -32,7 +34,8 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import Box from '@mui/material/Box';
+import Box from "@mui/material/Box";
+import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
 
 //////////////////////////////////////////////////////////////////
 interface UserType {
@@ -282,11 +285,11 @@ function EditToolbar(props: EditToolbarProps) {
 
   return (
     <Box
-    sx={{
-      p: 0.5,
-      pb: 0,
-    }}
-  >
+      sx={{
+        p: 0.5,
+        pb: 0,
+      }}
+    >
       <GridToolbarContainer>
         <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
           Add record
@@ -294,7 +297,7 @@ function EditToolbar(props: EditToolbarProps) {
       </GridToolbarContainer>
       <GridToolbarQuickFilter
         quickFilterParser={(searchInput: string) => {
-          console.log("QuickFilter");
+          console.log("quickFilter", searchInput);
           return searchInput
             .split(",")
             .map((value) => value.trim())
@@ -319,8 +322,24 @@ const UserDataGrid = () => {
     []
   );
 
+  function RenderClick(props: GridRenderCellParams<any, Number>) {
+    const { hasFocus, value } = props;
+    return (
+      <>
+        {value}
+        <Button
+          onClick={() => {
+            console.log("clickUser", value);
+          }}
+        >
+          Click
+        </Button>
+      </>
+    );
+  }
+
   const columns: GridColDef<Row>[] = [
-    { field: "id", headerName: "ID", width: 100 },
+    { field: "id", headerName: "ID", width: 100, renderCell: RenderClick },
     { field: "_id", headerName: "_ID", width: 50 },
     { field: "firstname", headerName: "FirstName", width: 100 },
     { field: "lastname", headerName: "LastName", width: 100 },
@@ -469,6 +488,7 @@ const UserDataGrid = () => {
         }}
         rowSelectionModel={rowSelectionModel}
         keepNonExistentRowsSelected
+        disableRowSelectionOnClick
       />
     </>
   );
