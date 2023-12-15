@@ -36,6 +36,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import Box from "@mui/material/Box";
 import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
+import { string } from "yup";
 
 //////////////////////////////////////////////////////////////////
 interface UserType {
@@ -60,17 +61,17 @@ const UsersData: UserType[] = [
   {
     id: 1,
     _id: 1,
-    firstname: "1",
+    firstname: "farshid",
     lastname: "1",
     email: "1@gmail.com",
     username: "1",
-    roles: ["User"],
+    roles: ["User", "Admin"],
     active: true,
   },
   {
     id: 2,
     _id: 2,
-    firstname: "2",
+    firstname: "farshad",
     lastname: "2",
     email: "2@gmail.com",
     username: "2",
@@ -80,7 +81,7 @@ const UsersData: UserType[] = [
   {
     id: 3,
     _id: 3,
-    firstname: "3",
+    firstname: "reza",
     lastname: "3",
     email: "3@gmail.com",
     username: "3",
@@ -90,12 +91,12 @@ const UsersData: UserType[] = [
   {
     id: 4,
     _id: 4,
-    firstname: "4",
+    firstname: "mahshid",
     lastname: "4",
     email: "4@gmail.com",
     username: "4",
     roles: ["User"],
-    active: true,
+    active: false,
   },
   {
     id: 5,
@@ -125,7 +126,7 @@ const UsersData: UserType[] = [
     email: "7@gmail.com",
     username: "7",
     roles: ["User"],
-    active: true,
+    active: false,
   },
   {
     id: 8,
@@ -145,7 +146,7 @@ const UsersData: UserType[] = [
     email: "9@gmail.com",
     username: "9",
     roles: ["User"],
-    active: true,
+    active: false,
   },
   {
     id: 10,
@@ -165,10 +166,26 @@ const UsersData: UserType[] = [
     lastname: "11",
     email: "11@gmail.com",
     username: "11",
-    roles: ["User"],
-    active: true,
+    roles: ["User", "Manager"],
+    active: false,
   },
 ];
+
+enum FilterType {
+  contains = "contains",
+  equals = "equals",
+  startsWith = "startsWith",
+  endsWith = "endsWith",
+  isEmpty = "isEmpty",
+  isNotEmpty = "isNotEmpty",
+  isAnyOf = "isAnyOf",
+}
+
+interface FilterKeyValue {
+  key: keyof UserType;
+  value: any;
+  filterType: FilterType;
+}
 
 interface KeyValue {
   key: keyof UserType;
@@ -185,23 +202,95 @@ const useUsersApi = (pagesize: number) => {
     fetchUsers(0);
   }, []);
 
-  function fetchUsers(pagenumber: number, filter?: KeyValue, sort?: KeyValue) {
+  function fetchUsers(
+    pagenumber: number,
+    filter?: FilterKeyValue,
+    sort?: KeyValue,
+    quicksearch?: string
+  ) {
     setisLoading(true);
     let filterUsersData = UsersData.slice();
 
     if (filter) {
-      filterUsersData = UsersData.filter(
-        (x) => x[filter.key] === filter?.value
-      );
+      switch (filter.filterType) {
+        case FilterType.contains:
+          filterUsersData = UsersData.filter((x) => {
+            console.log(x[filter.key]);
+            return x[filter.key].toString().includes(filter?.value);
+          });
+          console.log(filter.value);
+          break;
+        case FilterType.equals:
+          filterUsersData = UsersData.filter(
+            (x) => x[filter.key].toString() === filter?.value
+          );
+          break;
+        case FilterType.startsWith:
+          filterUsersData = UsersData.filter((x) =>
+            x[filter.key].toString().startsWith(filter?.value)
+          );
+          break;
+        case FilterType.endsWith:
+          filterUsersData = UsersData.filter((x) =>
+            x[filter.key].toString().endsWith(filter?.value)
+          );
+          break;
+        case FilterType.isEmpty:
+          filterUsersData = UsersData.filter(
+            (x) => x[filter.key].toString().trim() === ""
+          );
+          break;
+        case FilterType.isNotEmpty:
+          filterUsersData = UsersData.filter(
+            (x) => x[filter.key].toString().trim() !== ""
+          );
+          break;
+        case FilterType.isAnyOf:
+          filterUsersData = UsersData.filter((x) =>
+            filter?.value.includes(x[filter.key].toString())
+          );
+      }
     }
 
     if (sort) {
-      if (sort.key == "id") {
+      if (sort.key === "id") {
         if (sort.value == "asc")
-          filterUsersData = filterUsersData.sort((x) => x.id);
+          filterUsersData = filterUsersData.sort((x, y) => x.id - y.id);
         else if (sort.value == "desc")
-          filterUsersData = filterUsersData.sort((x) => x.id).reverse();
+          filterUsersData = filterUsersData.sort((x, y) => y.id - x.id);
       }
+      if (sort.key === "active") {
+        if (sort.value == "asc")
+          filterUsersData = filterUsersData.sort(
+            (x, y) => (x.active ? 1 : 0) - (y.active ? 1 : 0)
+          );
+        else if (sort.value == "desc")
+          filterUsersData = filterUsersData.sort(
+            (x, y) => (y.active ? 1 : 0) - (x.active ? 1 : 0)
+          );
+      }
+
+      if (typeof sort.key === "string") {
+        if (sort.value == "asc") {
+          filterUsersData = filterUsersData.sort((x, y) =>
+            x[sort.key].toString().localeCompare(y[sort.key].toString())
+          );
+        } else if (sort.value == "desc") {
+          filterUsersData = filterUsersData.sort((x, y) =>
+            y[sort.key].toString().localeCompare(x[sort.key].toString())
+          );
+        }
+      }
+    }
+
+    if (quicksearch) {
+      filterUsersData = UsersData.filter(
+        (x) =>
+          x.firstname.includes(quicksearch) ||
+          x.lastname.includes(quicksearch) ||
+          x.username.includes(quicksearch) ||
+          x.email.includes(quicksearch)
+      );
     }
 
     setTimeout(() => {
@@ -221,7 +310,7 @@ const useUsersApi = (pagesize: number) => {
       }
       setTotalCount(filterUsersData.length);
       setisLoading(false);
-    }, 1000);
+    }, 100);
   }
   return { datarows: users, next, totalcount, fetchUsers, isLoading };
 };
@@ -276,9 +365,12 @@ interface EditToolbarProps {
   setRowModesModel: (
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel
   ) => void;
+  x:number;
 }
 
 function EditToolbar(props: EditToolbarProps) {
+  const { x } = props;
+  const { setQuickSearch } = useGridStates();
   const handleClick = () => {
     console.log("Add record");
   };
@@ -297,7 +389,9 @@ function EditToolbar(props: EditToolbarProps) {
       </GridToolbarContainer>
       <GridToolbarQuickFilter
         quickFilterParser={(searchInput: string) => {
-          console.log("quickFilter", searchInput);
+          console.log("quickFilter", searchInput, "x", x);
+          setQuickSearch(searchInput);
+
           return searchInput
             .split(",")
             .map((value) => value.trim())
@@ -308,7 +402,41 @@ function EditToolbar(props: EditToolbarProps) {
   );
 }
 
+const useGridStates = () => {
+  const PAGE_SIZE = 5;
+
+  const [pagesize, setPageSize] = useState<number>(PAGE_SIZE);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: PAGE_SIZE,
+  });
+  const [quicksearch, setQuickSearch] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
+  const [sort, setSort] = useState<KeyValue | undefined>(undefined);
+
+  return {
+    paginationModel,
+    setPaginationModel,
+    pagesize,
+    quicksearch,
+    setQuickSearch,
+    filter,
+    setFilter,
+    sort,
+    setSort,
+  };
+};
+
 const UserDataGrid = () => {
+  const {
+    paginationModel,
+    setPaginationModel,
+    quicksearch,
+    filter,
+    setFilter,
+    sort,
+    setSort,
+  } = useGridStates();
   const deleteUser = useCallback(
     (id: GridRowId) => () => {
       console.log("deleteUser", id);
@@ -339,14 +467,51 @@ const UserDataGrid = () => {
   }
 
   const columns: GridColDef<Row>[] = [
-    { field: "id", headerName: "ID", width: 100, renderCell: RenderClick },
-    { field: "_id", headerName: "_ID", width: 50 },
-    { field: "firstname", headerName: "FirstName", width: 100 },
-    { field: "lastname", headerName: "LastName", width: 100 },
-    { field: "email", headerName: "Email", width: 100 },
-    { field: "username", headerName: "Username", width: 100 },
-    { field: "roles", headerName: "Roles", width: 100 },
-    { field: "active", headerName: "Active", width: 60 },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 100,
+      renderCell: RenderClick,
+    },
+    {
+      field: "_id",
+      headerName: "_ID",
+      width: 100,
+      sortable: false,
+      filterable: false,
+    },
+    {
+      field: "firstname",
+      headerName: "FirstName",
+      width: 100,
+    },
+    {
+      field: "lastname",
+      headerName: "LastName",
+      width: 100,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 100,
+      sortable: false,
+    },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 100,
+    },
+    {
+      field: "roles",
+      headerName: "Roles",
+      width: 100,
+      sortable: false,
+    },
+    {
+      field: "active",
+      headerName: "Active",
+      width: 100,
+    },
     {
       field: "actions",
       type: "actions",
@@ -377,12 +542,6 @@ const UserDataGrid = () => {
   const [rowCountState, setRowCountState] = useState(
     pageInfo?.totalRowCount || 0
   );
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: PAGE_SIZE,
-  });
-  const [filter, setFilter] = useState<KeyValue | undefined>(undefined);
-  const [sort, setSort] = useState<KeyValue | undefined>(undefined);
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
 
@@ -411,16 +570,17 @@ const UserDataGrid = () => {
     );
   }, [pageInfo?.totalRowCount, setRowCountState]);
 
+  useEffect(() => {
+    console.log("quicksearch", quicksearch);
+    fetchUsers(paginationModel.page, filter, sort, quicksearch);
+  }, [quicksearch]);
+
   const handlePaginationModelChange = (
     newPaginationModel: GridPaginationModel
   ) => {
-    if (
-      newPaginationModel.page === 0 ||
-      mapPageToNextCursor.current[newPaginationModel.page - 1]
-    ) {
-      setPaginationModel(newPaginationModel);
-      fetchUsers(newPaginationModel.page, filter, sort);
-    }
+    setPaginationModel(newPaginationModel);
+    console.log(newPaginationModel.page);
+    fetchUsers(newPaginationModel.page, filter, sort, quicksearch);
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
@@ -432,16 +592,18 @@ const UserDataGrid = () => {
         const result = {
           key: filterModel.items[0].field as keyof UserType,
           value: filterModel.items[0].value,
+          filterType: filterModel.items[0].operator,
         };
+        console.log(result);
         setFilter(result);
-        fetchUsers(paginationModel.page, result, sort);
+        fetchUsers(paginationModel.page, result, sort, quicksearch);
       } else if (filter) {
         setFilter(undefined);
-        fetchUsers(paginationModel.page, undefined, sort);
+        fetchUsers(paginationModel.page, undefined, sort, quicksearch);
       }
     } else if (filter) {
       setFilter(undefined);
-      fetchUsers(paginationModel.page, undefined, sort);
+      fetchUsers(paginationModel.page, undefined, sort, quicksearch);
     }
   };
 
@@ -452,12 +614,14 @@ const UserDataGrid = () => {
         value: sortModel[0].sort!,
       };
       setSort(result);
-      fetchUsers(paginationModel.page, filter, result);
+      fetchUsers(paginationModel.page, filter, result, quicksearch);
     } else {
       setSort(undefined);
-      fetchUsers(paginationModel.page, filter, undefined);
+      fetchUsers(paginationModel.page, filter, undefined, quicksearch);
     }
   };
+
+  const x = 10;
 
   return (
     <>
