@@ -191,10 +191,6 @@ const useUsersApi = (pagesize: number) => {
   const [next, setNext] = useState<number>();
   const [totalcount, setTotalCount] = useState<number>();
 
-  useEffect(() => {
-    fetchUsers(0);
-  }, []);
-
   function fetchUsers(
     pagenumber: number,
     filter?: FilterKeyValue,
@@ -210,10 +206,12 @@ const useUsersApi = (pagesize: number) => {
         case FilterType.contains:
           {
             filterUsersData = filterUsersData.filter((x) => {
-               console.log(x[filter.key],x[filter.key].toString().includes(filter?.value));
+              console.log(
+                x[filter.key],
+                x[filter.key].toString().includes(filter?.value)
+              );
               return x[filter.key].toString().includes(filter?.value);
             });
-           
           }
           break;
         case FilterType.equals:
