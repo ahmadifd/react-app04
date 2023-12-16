@@ -14,13 +14,7 @@ import {
   GridToolbarContainer,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   gridFilteredTopLevelRowCountSelector,
   gridPageSizeSelector,
@@ -35,9 +29,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import Box from "@mui/material/Box";
-import { TouchRippleActions } from "@mui/material/ButtonBase/TouchRipple";
-import { string } from "yup";
-
 //////////////////////////////////////////////////////////////////
 interface UserType {
   id: number;
@@ -192,6 +183,8 @@ interface KeyValue {
   value: string;
 }
 
+///////////////////////////////////////////////////////////////////
+
 const useUsersApi = (pagesize: number) => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setisLoading] = useState<boolean>(false);
@@ -211,55 +204,60 @@ const useUsersApi = (pagesize: number) => {
     setisLoading(true);
     let filterUsersData = UsersData.slice();
 
+    //filter
     if (filter) {
       switch (filter.filterType) {
         case FilterType.contains:
-          filterUsersData = UsersData.filter((x) => {
-            console.log(x[filter.key]);
-            return x[filter.key].toString().includes(filter?.value);
-          });
-          console.log(filter.value);
+          {
+            filterUsersData = filterUsersData.filter((x) => {
+               console.log(x[filter.key],x[filter.key].toString().includes(filter?.value));
+              return x[filter.key].toString().includes(filter?.value);
+            });
+           
+          }
           break;
         case FilterType.equals:
-          filterUsersData = UsersData.filter(
+          filterUsersData = filterUsersData.filter(
             (x) => x[filter.key].toString() === filter?.value
           );
           break;
         case FilterType.startsWith:
-          filterUsersData = UsersData.filter((x) =>
+          filterUsersData = filterUsersData.filter((x) =>
             x[filter.key].toString().startsWith(filter?.value)
           );
           break;
         case FilterType.endsWith:
-          filterUsersData = UsersData.filter((x) =>
+          filterUsersData = filterUsersData.filter((x) =>
             x[filter.key].toString().endsWith(filter?.value)
           );
           break;
         case FilterType.isEmpty:
-          filterUsersData = UsersData.filter(
+          filterUsersData = filterUsersData.filter(
             (x) => x[filter.key].toString().trim() === ""
           );
           break;
         case FilterType.isNotEmpty:
-          filterUsersData = UsersData.filter(
+          filterUsersData = filterUsersData.filter(
             (x) => x[filter.key].toString().trim() !== ""
           );
           break;
         case FilterType.isAnyOf:
-          filterUsersData = UsersData.filter((x) =>
+          filterUsersData = filterUsersData.filter((x) =>
             filter?.value.includes(x[filter.key].toString())
           );
       }
     }
-
+    //sort
     if (sort) {
+      //number
       if (sort.key === "id") {
         if (sort.value == "asc")
           filterUsersData = filterUsersData.sort((x, y) => x.id - y.id);
         else if (sort.value == "desc")
           filterUsersData = filterUsersData.sort((x, y) => y.id - x.id);
       }
-      if (sort.key === "active") {
+      //boolean
+      else if (sort.key === "active") {
         if (sort.value == "asc")
           filterUsersData = filterUsersData.sort(
             (x, y) => (x.active ? 1 : 0) - (y.active ? 1 : 0)
@@ -269,8 +267,10 @@ const useUsersApi = (pagesize: number) => {
             (x, y) => (y.active ? 1 : 0) - (x.active ? 1 : 0)
           );
       }
-
-      if (typeof sort.key === "string") {
+      //string
+      else if (
+        ["firstname", "lastname", "username", "email"].includes(sort.key)
+      ) {
         if (sort.value == "asc") {
           filterUsersData = filterUsersData.sort((x, y) =>
             x[sort.key].toString().localeCompare(y[sort.key].toString())
@@ -282,9 +282,9 @@ const useUsersApi = (pagesize: number) => {
         }
       }
     }
-
+    //quicksearch
     if (quicksearch) {
-      filterUsersData = UsersData.filter(
+      filterUsersData = filterUsersData.filter(
         (x) =>
           x.firstname.includes(quicksearch) ||
           x.lastname.includes(quicksearch) ||
@@ -292,6 +292,20 @@ const useUsersApi = (pagesize: number) => {
           x.email.includes(quicksearch)
       );
     }
+
+    console.log(
+      "pagenumber",
+      pagenumber,
+      "\n",
+      "filter",
+      filter,
+      "\n",
+      "sort",
+      sort,
+      "\n",
+      "quicksearch",
+      quicksearch
+    );
 
     setTimeout(() => {
       const fromindex = pagenumber * pagesize;
@@ -365,12 +379,12 @@ interface EditToolbarProps {
   setRowModesModel: (
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel
   ) => void;
-  x:number;
+  setQuickSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
+  quicksearch: string;
 }
 
-function EditToolbar(props: EditToolbarProps) {
-  const { x } = props;
-  const { setQuickSearch } = useGridStates();
+const EditToolbar = (props: EditToolbarProps) => {
+  const { setQuickSearch, quicksearch } = props;
   const handleClick = () => {
     console.log("Add record");
   };
@@ -389,9 +403,11 @@ function EditToolbar(props: EditToolbarProps) {
       </GridToolbarContainer>
       <GridToolbarQuickFilter
         quickFilterParser={(searchInput: string) => {
-          console.log("quickFilter", searchInput, "x", x);
-          setQuickSearch(searchInput);
-
+          if (!searchInput || searchInput.trim() === "") {
+            if (quicksearch) setQuickSearch(undefined);
+          } else {
+            setQuickSearch(searchInput.trim());
+          }
           return searchInput
             .split(",")
             .map((value) => value.trim())
@@ -400,72 +416,12 @@ function EditToolbar(props: EditToolbarProps) {
       />
     </Box>
   );
-}
-
-const useGridStates = () => {
-  const PAGE_SIZE = 5;
-
-  const [pagesize, setPageSize] = useState<number>(PAGE_SIZE);
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: PAGE_SIZE,
-  });
-  const [quicksearch, setQuickSearch] = useState<string | undefined>(undefined);
-  const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
-  const [sort, setSort] = useState<KeyValue | undefined>(undefined);
-
-  return {
-    paginationModel,
-    setPaginationModel,
-    pagesize,
-    quicksearch,
-    setQuickSearch,
-    filter,
-    setFilter,
-    sort,
-    setSort,
-  };
 };
 
+///////////////////////////////////////////////////////////////////
+
 const UserDataGrid = () => {
-  const {
-    paginationModel,
-    setPaginationModel,
-    quicksearch,
-    filter,
-    setFilter,
-    sort,
-    setSort,
-  } = useGridStates();
-  const deleteUser = useCallback(
-    (id: GridRowId) => () => {
-      console.log("deleteUser", id);
-    },
-    []
-  );
-  const editUser = useCallback(
-    (id: GridRowId) => () => {
-      console.log("editUser", id);
-    },
-    []
-  );
-
-  function RenderClick(props: GridRenderCellParams<any, Number>) {
-    const { hasFocus, value } = props;
-    return (
-      <>
-        {value}
-        <Button
-          onClick={() => {
-            console.log("clickUser", value);
-          }}
-        >
-          Click
-        </Button>
-      </>
-    );
-  }
-
+  const PAGE_SIZE = 5;
   const columns: GridColDef<Row>[] = [
     {
       field: "id",
@@ -532,12 +488,18 @@ const UserDataGrid = () => {
       ],
     },
   ];
-
-  const PAGE_SIZE = 5;
+  const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
 
   const { datarows, next, totalcount, fetchUsers, isLoading } =
     useUsersApi(PAGE_SIZE);
 
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: PAGE_SIZE,
+  });
+  const [quicksearch, setQuickSearch] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
+  const [sort, setSort] = useState<KeyValue | undefined>(undefined);
   const [pageInfo, setpageInfo] = useState<PageInfo>({});
   const [rowCountState, setRowCountState] = useState(
     pageInfo?.totalRowCount || 0
@@ -545,7 +507,35 @@ const UserDataGrid = () => {
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
 
-  const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
+  const deleteUser = useCallback(
+    (id: GridRowId) => () => {
+      console.log("deleteUser", id);
+    },
+    []
+  );
+
+  const editUser = useCallback(
+    (id: GridRowId) => () => {
+      console.log("editUser", id);
+    },
+    []
+  );
+
+  function RenderClick(props: GridRenderCellParams<any, Number>) {
+    const { hasFocus, value } = props;
+    return (
+      <>
+        {value}
+        <Button
+          onClick={() => {
+            console.log("clickUser", value);
+          }}
+        >
+          Click
+        </Button>
+      </>
+    );
+  }
 
   useEffect(() => {
     setpageInfo({
@@ -553,7 +543,7 @@ const UserDataGrid = () => {
       nextCursor: next,
       pageSize: PAGE_SIZE,
     });
-  }, [datarows, next]);
+  }, [datarows, next, totalcount]);
 
   useEffect(() => {
     if (pageInfo?.nextCursor) {
@@ -571,16 +561,14 @@ const UserDataGrid = () => {
   }, [pageInfo?.totalRowCount, setRowCountState]);
 
   useEffect(() => {
-    console.log("quicksearch", quicksearch);
     fetchUsers(paginationModel.page, filter, sort, quicksearch);
-  }, [quicksearch]);
+  }, [quicksearch, filter, sort, paginationModel.page]);
 
   const handlePaginationModelChange = (
     newPaginationModel: GridPaginationModel
   ) => {
     setPaginationModel(newPaginationModel);
-    console.log(newPaginationModel.page);
-    fetchUsers(newPaginationModel.page, filter, sort, quicksearch);
+    //fetchUsers(newPaginationModel.page, filter, sort, quicksearch);
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
@@ -589,21 +577,20 @@ const UserDataGrid = () => {
         filterModel.items[0].value != undefined &&
         filterModel.items[0].value != ""
       ) {
-        const result = {
+        const result: FilterKeyValue = {
           key: filterModel.items[0].field as keyof UserType,
           value: filterModel.items[0].value,
-          filterType: filterModel.items[0].operator,
+          filterType: filterModel.items[0].operator as FilterType,
         };
-        console.log(result);
         setFilter(result);
-        fetchUsers(paginationModel.page, result, sort, quicksearch);
+        //(paginationModel.page, result, sort, quicksearch);
       } else if (filter) {
         setFilter(undefined);
-        fetchUsers(paginationModel.page, undefined, sort, quicksearch);
+        //fetchUsers(paginationModel.page, undefined, sort, quicksearch);
       }
     } else if (filter) {
       setFilter(undefined);
-      fetchUsers(paginationModel.page, undefined, sort, quicksearch);
+      //fetchUsers(paginationModel.page, undefined, sort, quicksearch);
     }
   };
 
@@ -614,14 +601,12 @@ const UserDataGrid = () => {
         value: sortModel[0].sort!,
       };
       setSort(result);
-      fetchUsers(paginationModel.page, filter, result, quicksearch);
+      //fetchUsers(paginationModel.page, filter, result, quicksearch);
     } else {
       setSort(undefined);
-      fetchUsers(paginationModel.page, filter, undefined, quicksearch);
+      //fetchUsers(paginationModel.page, filter, undefined, quicksearch);
     }
   };
-
-  const x = 10;
 
   return (
     <>
@@ -636,7 +621,13 @@ const UserDataGrid = () => {
           pagination: CustomPagination,
           toolbar: EditToolbar,
         }}
-        slotProps={{ toolbar: { showQuickFilter: true } }}
+        slotProps={{
+          toolbar: {
+            quicksearch,
+            setQuickSearch,
+            showQuickFilter: true,
+          },
+        }}
         checkboxSelection
         paginationModel={paginationModel}
         loading={isLoading}
@@ -647,7 +638,7 @@ const UserDataGrid = () => {
         onRowSelectionModelChange={(
           newRowSelectionModel: GridRowSelectionModel
         ) => {
-          console.log(datarows, newRowSelectionModel);
+          console.log(newRowSelectionModel);
           setRowSelectionModel(newRowSelectionModel);
         }}
         rowSelectionModel={rowSelectionModel}
@@ -659,3 +650,26 @@ const UserDataGrid = () => {
 };
 
 export default UserDataGrid;
+
+// const userType: UserType = {
+//   id: 0,
+//   _id: 0,
+//   firstname: "",
+//   lastname: "",
+//   username: "",
+//   roles: [],
+//   active: false,
+//   email: "",
+// };
+
+// console.log('Object.keys');
+// Object.keys(userType).forEach((key) => {
+//   //if (typeof key === "number" && sort.key === key) {
+//     console.log(typeof key);
+//   //}
+// });
+// console.log(keys);
+// const userType: UserType = {id:1,_id:1};
+// const headers = Object.keys(userType).map((key) => {
+//   return { text: key, value: key };
+// });
