@@ -31,7 +31,26 @@ interface FilterKeyValue {
   value: any;
   filterType: FilterType;
 }
+interface UserType {
+  id: number;
+  _id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+  username: string;
+  roles: string[];
+  active: boolean;
+}
 
+enum FilterType {
+  contains = "contains",
+  equals = "equals",
+  startsWith = "startsWith",
+  endsWith = "endsWith",
+  isEmpty = "isEmpty",
+  isNotEmpty = "isNotEmpty",
+  isAnyOf = "isAnyOf",
+}
 interface KeyValue {
   key: keyof UserType;
   value: string;
@@ -315,10 +334,12 @@ const UsersList = () => {
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
+    console.log(filterModel);
     if (filterModel.items && filterModel.items.length > 0) {
       if (
-        filterModel.items[0].value != undefined &&
-        filterModel.items[0].value != ""
+        filterModel.items[0].operator === "isEmpty" || filterModel.items[0].operator === "isNotEmpty" ||
+        (filterModel.items[0].value != undefined &&
+          filterModel.items[0].value != "")
       ) {
         const result: FilterKeyValue = {
           key: filterModel.items[0].field as keyof UserType,
