@@ -66,7 +66,6 @@ import MuiPieChart from "./components/mui/MuiPieChart";
 import MuiScatterChart from "./components/mui/MuiScatterChart";
 import MuiDataGrid from "./components/mui/MuiDataGrid";
 import UserDataGrid from "./components/mui/UserDataGrid";
-import UserManagement from "./features/users/UserManagement";
 
 function App() {
   return (
