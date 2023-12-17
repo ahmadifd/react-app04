@@ -13,7 +13,7 @@ const DashLayout = () => {
 
   return (
     <>
-      <div className="container">
+      <div>
         <div>
           <Outlet />
         </div>

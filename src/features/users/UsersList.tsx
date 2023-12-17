@@ -158,10 +158,11 @@ const UsersList = () => {
 
   const fetchData = async () => {
     const result = await GetDataGridUsers({
-      pagenumber: 1,
+      pagenumber: paginationModel.page,
       filter: filter,
       sort: sort,
       quichsearch: quicksearch,
+      pagesize: paginationModel.pageSize,
     });
     const response = result as {
       data: {
@@ -207,7 +208,7 @@ const UsersList = () => {
 
   useEffect(() => {
     fetchData();
-  }, [quicksearch, filter, sort, paginationModel.page]);
+  }, [quicksearch, filter, sort, paginationModel]);
 
   const columns: GridColDef<Row>[] = [
     {
@@ -216,13 +217,13 @@ const UsersList = () => {
       width: 100,
       renderCell: RenderClick,
     },
-    {
-      field: "_id",
-      headerName: "_ID",
-      width: 100,
-      sortable: false,
-      filterable: false,
-    },
+    // {
+    //   field: "_id",
+    //   headerName: "_ID",
+    //   width: 100,
+    //   sortable: false,
+    //   filterable: false,
+    // },
     {
       field: "firstname",
       headerName: "FirstName",
@@ -294,7 +295,7 @@ const UsersList = () => {
     const { hasFocus, value } = props;
     return (
       <>
-        {value}
+        {/* {value} */}
         <Button
           onClick={() => {
             console.log("clickUser", value);
@@ -353,7 +354,7 @@ const UsersList = () => {
   let content;
   if (isError) {
     content = (
-      <div className="container">
+      <div>
         <div className="alert alert-danger">
           {`${(error as { data: { message: string } })?.data?.message} - `}
         </div>
