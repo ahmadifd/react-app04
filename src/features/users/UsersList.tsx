@@ -10,7 +10,9 @@ import {
   GridPaginationModel,
   GridRenderCellParams,
   GridRowId,
+  GridRowModesModel,
   GridRowSelectionModel,
+  GridRowsProp,
   GridSortModel,
   GridToolbarContainer,
   GridToolbarQuickFilter,
@@ -180,7 +182,7 @@ const UsersList = () => {
       pagenumber: paginationModel.page,
       filter: filter,
       sort: sort,
-      quichsearch: quicksearch,
+      quicksearch: quicksearch,
       pagesize: paginationModel.pageSize,
     });
     const response = result as {
@@ -230,12 +232,6 @@ const UsersList = () => {
   }, [quicksearch, filter, sort, paginationModel]);
 
   const columns: GridColDef<Row>[] = [
-    {
-      field: "id",
-      headerName: "ID",
-      width: 100,
-      renderCell: RenderClick,
-    },
     // {
     //   field: "_id",
     //   headerName: "_ID",
@@ -274,6 +270,7 @@ const UsersList = () => {
       field: "active",
       headerName: "Active",
       width: 100,
+
     },
     {
       field: "actions",
@@ -293,6 +290,14 @@ const UsersList = () => {
           // showInMenu
         />,
       ],
+    },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 100,
+      filterable: false,
+      sortable: false,
+      renderCell: RenderClick,
     },
   ];
 
@@ -337,7 +342,8 @@ const UsersList = () => {
     console.log(filterModel);
     if (filterModel.items && filterModel.items.length > 0) {
       if (
-        filterModel.items[0].operator === "isEmpty" || filterModel.items[0].operator === "isNotEmpty" ||
+        filterModel.items[0].operator === "isEmpty" ||
+        filterModel.items[0].operator === "isNotEmpty" ||
         (filterModel.items[0].value != undefined &&
           filterModel.items[0].value != "")
       ) {

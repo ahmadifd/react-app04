@@ -8,14 +8,14 @@ import { User } from "../../models/User";
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getDataGridUsers: builder.mutation({
-      query: ({ pagenumber, filter, sort, quickserarch, pagesize }) => ({
+      query: ({ pagenumber, filter, sort, quicksearch, pagesize }) => ({
         url: "/users",
         method: "POST",
         body: {
           pagenumber,
           filter,
           sort,
-          quickserarch,
+          quicksearch,
           pagesize,
         },
       }),
