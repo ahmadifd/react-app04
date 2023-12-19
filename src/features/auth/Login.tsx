@@ -51,6 +51,7 @@ const Login = () => {
       setErrors([]);
       return true;
     } catch (err) {
+      console.log(user,password,err);
       setErrors(getError(err));
       return false;
     }

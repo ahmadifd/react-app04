@@ -10,11 +10,12 @@ const useInput = (key: KeyState, initValue: ValueState) => {
 
   const attributeObj = {
     value,
-    onChange: (e: React.FormEvent<HTMLInputElement>) =>
-      setValue(e.currentTarget.value),
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      setValue(e.target.value), console.log(e.target.value);
+    },
   };
 
-  return [value, reset, attributeObj];
+  return [value, attributeObj, reset];
 };
 
 export default useInput;
