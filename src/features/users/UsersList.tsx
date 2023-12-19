@@ -27,6 +27,7 @@ import { Box, Button, TablePaginationProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import { boolean } from "yup";
 
 interface FilterKeyValue {
   key: keyof UserType;
@@ -34,8 +35,9 @@ interface FilterKeyValue {
   filterType: FilterType;
 }
 interface UserType {
-  id: number;
-  _id: number;
+  rownumber: number;
+  id: string;
+  _id: string;
   firstname: string;
   lastname: string;
   email: string;
@@ -194,7 +196,7 @@ const UsersList = () => {
         };
       };
     };
-    console.log(response.data.data);
+    console.log(response.data.data.users);
     setDatarows(response.data.data.users);
     setNext(response.data.data.next);
     setTotalcount(response.data.data.totalCount);
@@ -232,13 +234,13 @@ const UsersList = () => {
   }, [quicksearch, filter, sort, paginationModel]);
 
   const columns: GridColDef<Row>[] = [
-    // {
-    //   field: "_id",
-    //   headerName: "_ID",
-    //   width: 100,
-    //   sortable: false,
-    //   filterable: false,
-    // },
+    {
+      field: "rownumber",
+      headerName: "RowNumber",
+      width: 100,
+      type: "number",
+      align:"center"
+    },
     {
       field: "firstname",
       headerName: "FirstName",
@@ -252,7 +254,7 @@ const UsersList = () => {
     {
       field: "email",
       headerName: "Email",
-      width: 100,
+      width: 200,
       sortable: false,
     },
     {
@@ -270,12 +272,13 @@ const UsersList = () => {
       field: "active",
       headerName: "Active",
       width: 100,
-
+      type: "boolean",
     },
     {
       field: "actions",
       type: "actions",
       width: 80,
+      headerName: "Actions",
       getActions: (params) => [
         <GridActionsCellItem
           icon={<DeleteIcon />}
@@ -297,6 +300,7 @@ const UsersList = () => {
       width: 100,
       filterable: false,
       sortable: false,
+      headerAlign:"center",
       renderCell: RenderClick,
     },
   ];
