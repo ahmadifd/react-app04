@@ -15,8 +15,8 @@ const ShoppingLayout = () => {
 
   return (
     <>
-      <Stack direction="column">
-        <Stack>
+      <Stack direction="column" mx={5}>
+        <Stack direction="column">
           <Outlet />
         </Stack>
         <Box>

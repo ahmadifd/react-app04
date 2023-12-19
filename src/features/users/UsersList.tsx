@@ -238,46 +238,61 @@ const UsersList = () => {
       headerName: "RowNumber",
       width: 100,
       type: "number",
-      align: "center",
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "firstname",
       headerName: "FirstName",
       width: 100,
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "lastname",
       headerName: "LastName",
       width: 100,
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "email",
       headerName: "Email",
       width: 200,
       sortable: false,
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "username",
       headerName: "Username",
       width: 100,
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "roles",
       headerName: "Roles",
       width: 100,
       sortable: false,
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "active",
       headerName: "Active",
       width: 100,
       type: "boolean",
+      headerAlign: "center",
+      align:"center",
     },
     {
       field: "actions",
       type: "actions",
       width: 80,
-      headerName: "Actions",
+      headerName: "Actions1",
+      headerAlign: "center",
+      align:"center",
       getActions: (params) => [
         <GridActionsCellItem
           icon={<DeleteIcon />}
@@ -295,11 +310,12 @@ const UsersList = () => {
     },
     {
       field: "id",
-      headerName: "ID",
+      headerName: "Actions2",
       width: 100,
       filterable: false,
       sortable: false,
       headerAlign: "center",
+      align:"center",
       renderCell: RenderClick,
     },
   ];
@@ -392,45 +408,41 @@ const UsersList = () => {
     );
   } else {
     content = (
-      <div>
-        <>
-          <DataGrid
-            rows={datarows}
-            columns={columns}
-            pageSizeOptions={[PAGE_SIZE]}
-            rowCount={rowCountState}
-            paginationMode="server"
-            onPaginationModelChange={handlePaginationModelChange}
-            slots={{
-              pagination: CustomPagination,
-              toolbar: EditToolbar,
-            }}
-            slotProps={{
-              toolbar: {
-                quicksearch,
-                setQuickSearch,
-                showQuickFilter: true,
-              },
-            }}
-            checkboxSelection
-            paginationModel={paginationModel}
-            loading={isLoading}
-            filterMode="server"
-            onFilterModelChange={onFilterChange}
-            sortingMode="server"
-            onSortModelChange={handleSortModelChange}
-            onRowSelectionModelChange={(
-              newRowSelectionModel: GridRowSelectionModel
-            ) => {
-              console.log(newRowSelectionModel);
-              setRowSelectionModel(newRowSelectionModel);
-            }}
-            rowSelectionModel={rowSelectionModel}
-            keepNonExistentRowsSelected
-            disableRowSelectionOnClick
-          />
-        </>
-      </div>
+      <DataGrid
+        rows={datarows}
+        columns={columns}
+        pageSizeOptions={[PAGE_SIZE]}
+        rowCount={rowCountState}
+        paginationMode="server"
+        onPaginationModelChange={handlePaginationModelChange}
+        slots={{
+          pagination: CustomPagination,
+          toolbar: EditToolbar,
+        }}
+        slotProps={{
+          toolbar: {
+            quicksearch,
+            setQuickSearch,
+            showQuickFilter: true,
+          },
+        }}
+        checkboxSelection
+        paginationModel={paginationModel}
+        loading={isLoading}
+        filterMode="server"
+        onFilterModelChange={onFilterChange}
+        sortingMode="server"
+        onSortModelChange={handleSortModelChange}
+        onRowSelectionModelChange={(
+          newRowSelectionModel: GridRowSelectionModel
+        ) => {
+          console.log(newRowSelectionModel);
+          setRowSelectionModel(newRowSelectionModel);
+        }}
+        rowSelectionModel={rowSelectionModel}
+        keepNonExistentRowsSelected
+        disableRowSelectionOnClick
+      />
     );
   }
   return content;
