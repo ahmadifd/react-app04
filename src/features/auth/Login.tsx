@@ -7,6 +7,15 @@ import getError from "../../utilities/getError";
 import { useLoginMutation } from "./authApiSlice";
 import { setCredentials } from "./authSlice";
 import { useAppDispatch } from "../../app/store";
+import { Box, Stack } from "@mui/system";
+import {
+  Alert,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+} from "@mui/material";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -22,10 +31,11 @@ const Login = () => {
   const [persist, setPersist] = usePersist();
   const [errors, setErrors] = useState<string[]>();
 
-  const handlePwdInput = (e: React.FormEvent<HTMLInputElement>) =>
-    setPassword(e.currentTarget.value);
+  const handlePwdInput = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setPassword(e.target.value);
 
-  const handleToggle = () => setPersist((prev: boolean) => !prev);
+  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setPersist((prev: boolean) => !prev);
 
   let schema = yup.object().shape({
     username: yup.string().required(),
@@ -52,7 +62,8 @@ const Login = () => {
 
   useEffect(() => {}, [user, password]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("handleSubmit");
     e.preventDefault();
     const isValid = await validate();
     try {
@@ -87,66 +98,64 @@ const Login = () => {
   if (isLoading) return <h1>...isLoading</h1>;
 
   const content = (
-    <div className="container">
-      <div>
-        {errMsg && <div className="alert alert-danger">{errMsg}</div>}
+    <>
+      <Stack direction="column" mx={5} my={1}>
+        <Stack mb={1}>
+          {errMsg && (
+            <Alert variant="filled" severity="error">
+              {errMsg}
+            </Alert>
+          )}
 
-        {errors && errors.length > 0 && (
-          <div className="alert alert-danger">
-            {errors.map((e, i) => {
-              return <li key={i}>{e}</li>;
-            })}
-          </div>
-        )}
-      </div>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username:</label>
-            <input
-              type="text"
-              {...userAttribs}
-              id="username"
-              className="form-control"
-              autoComplete="off"
-              ref={userRef}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              onChange={handlePwdInput}
-            />
-          </div>
-          <div>
-            <button className="btn btn-primary">Sign In</button>
-            <label htmlFor="persist">
-              <input
-                type="checkbox"
-                id="persist"
-                onChange={handleToggle}
-                checked={persist}
+          {errors && errors.length > 0 && (
+            <Alert variant="filled" severity="error">
+              {errors.map((e, i) => {
+                return <li key={i}>{e}</li>;
+              })}
+            </Alert>
+          )}
+        </Stack>
+        <Box component="form" onSubmit={handleSubmit}>
+          <Grid container>
+            <Grid mb={1} item>
+              <TextField label="Username" ref={userRef} {...userAttribs} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Password"
+                type="password"
+                onChange={handlePwdInput}
               />
-              Trust This Device
-            </label>
-          </div>
-        </form>
-      </div>
-
-      <div>
-        <Link to="/"> Back to Home</Link>
-        <p>
-          Need an Account?
-          <br />
-          <span className="line">
-            <Link to="/register">Sign Up</Link>
-          </span>
-        </p>
-      </div>
-    </div>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={persist}
+                    onChange={handleToggle}
+                    size="small"
+                    color="secondary"
+                  />
+                }
+                label="Trust This Device"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button type="submit" variant="contained">
+                Sign In
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+        <Box>
+          <Link to="/"> Back to Home</Link>
+        </Box>
+        <Box>Need an Account?</Box>
+        <Box>
+          <Link to="/register">Sign Up</Link>
+        </Box>
+      </Stack>
+    </>
   );
   return content;
 };

@@ -1,12 +1,12 @@
+import { Stack } from "@mui/system";
+
 const Shopping = () => {
   return (
     <>
-      <div className="container">
-        <h1>Shopping</h1>
-        <br />
-        <p>You are logged in!</p>
-        <br />
-      </div>
+      <Stack direction="column">
+        <Stack>Shopping</Stack>
+        <Stack>You are logged in!</Stack>
+      </Stack>
     </>
   );
 };

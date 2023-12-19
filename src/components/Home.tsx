@@ -6,13 +6,11 @@ const Home = () => {
 
   return (
     <>
-      <div className="container">
-        {isManager || isAdmin ? (
-          <Navigate to="/dash" />
-        ) : (
-          <Navigate to="/shopping" />
-        )}
-      </div>
+      {isManager || isAdmin ? (
+        <Navigate to="/dash" />
+      ) : (
+        <Navigate to="/shopping" />
+      )}
     </>
   );
 };

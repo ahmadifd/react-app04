@@ -1,14 +1,13 @@
 const Register = () => {
-  const handleSubmit = async (e: React.FormEvent) => {};
+  // const handleSubmit = async (e: React.FormEvent) => {};
 
-  const content = (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
+  const content =
+    // <div className="container">
+    //   <form onSubmit={handleSubmit}>
+    "Register";
 
-        
-      </form>
-    </div>
-  );
+  //   </form>
+  // </div>
 
   return content;
 };

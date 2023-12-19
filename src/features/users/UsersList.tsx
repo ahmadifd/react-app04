@@ -27,7 +27,6 @@ import { Box, Button, TablePaginationProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { boolean } from "yup";
 
 interface FilterKeyValue {
   key: keyof UserType;
@@ -239,7 +238,7 @@ const UsersList = () => {
       headerName: "RowNumber",
       width: 100,
       type: "number",
-      align:"center"
+      align: "center",
     },
     {
       field: "firstname",
@@ -300,7 +299,7 @@ const UsersList = () => {
       width: 100,
       filterable: false,
       sortable: false,
-      headerAlign:"center",
+      headerAlign: "center",
       renderCell: RenderClick,
     },
   ];

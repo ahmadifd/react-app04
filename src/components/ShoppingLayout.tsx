@@ -1,5 +1,7 @@
-import {  Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useSendLogoutMutation } from "../features/auth/authApiSlice";
+import { Box, Stack } from "@mui/system";
+import { Button } from "@mui/material";
 
 const ShoppingLayout = () => {
   const navigate = useNavigate();
@@ -13,16 +15,16 @@ const ShoppingLayout = () => {
 
   return (
     <>
-      <div className="container">
-        <div>
+      <Stack direction="column">
+        <Stack>
           <Outlet />
-        </div>
-        <div>
-          <button className="btn btn-danger" onClick={signOut}>
+        </Stack>
+        <Box>
+          <Button onClick={signOut} variant="contained" color="error">
             Sign Out
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Box>
+      </Stack>
     </>
   );
 };

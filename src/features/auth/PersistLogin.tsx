@@ -2,7 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 import usePersist from "../../hooks/usePersist";
 import { useAppSelector } from "../../app/store";
 import { selectCurrentToken } from "./authSlice";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRefreshMutation } from "./authApiSlice";
 
 const PersistLogin = () => {
