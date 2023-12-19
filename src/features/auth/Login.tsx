@@ -15,6 +15,7 @@ import {
   FormControlLabel,
   Grid,
   TextField,
+  Typography,
 } from "@mui/material";
 
 const Login = () => {
@@ -34,8 +35,7 @@ const Login = () => {
   const handlePwdInput = (e: React.ChangeEvent<HTMLInputElement>) =>
     setPassword(e.target.value);
 
-  const handleToggle = () =>
-    setPersist((prev: boolean) => !prev);
+  const handleToggle = () => setPersist((prev: boolean) => !prev);
 
   let schema = yup.object().shape({
     username: yup.string().required(),
@@ -148,11 +148,17 @@ const Login = () => {
           </Grid>
         </Box>
         <Box>
-          <Link to="/"> Back to Home</Link>
+          <Typography>
+            <Link to="/"> Back to Home</Link>
+          </Typography>
         </Box>
-        <Box>Need an Account?</Box>
         <Box>
-          <Link to="/register">Sign Up</Link>
+          <Typography>Need an Account?</Typography>
+        </Box>
+        <Box>
+          <Typography>
+            <Link to="/register">Sign Up</Link>
+          </Typography>
         </Box>
       </Stack>
     </>

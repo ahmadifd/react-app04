@@ -1,10 +1,13 @@
+import { Typography } from "@mui/material";
+
 const Register = () => {
   // const handleSubmit = async (e: React.FormEvent) => {};
 
-  const content =
+  const content = (
     // <div className="container">
     //   <form onSubmit={handleSubmit}>
-    "Register";
+    <Typography>Register</Typography>
+  );
 
   //   </form>
   // </div>
