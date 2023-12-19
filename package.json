@@ -1,6 +1,6 @@
 {
   "name": "react-app04",
-  "homepage": "https://ahmadifd.github.io/react-app04",
+  "homepage": "https://ahmadifd.github.io/react-app04/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -41,7 +41,7 @@
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "gh-pages": "^6.0.0",
+    "gh-pages": "^6.1.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   }
