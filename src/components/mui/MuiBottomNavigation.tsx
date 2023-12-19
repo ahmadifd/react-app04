@@ -11,7 +11,7 @@ export const MuiBottomNavigation = () => {
       sx={{ width: "100%", position: "absolute", bottom: 0 }}
       showLabels
       value={value}
-      onChange={(event, newValue) => {
+      onChange={(_event, newValue) => {
         setValue(newValue);
       }}
     >

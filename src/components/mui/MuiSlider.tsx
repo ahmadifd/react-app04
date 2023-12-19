@@ -6,7 +6,7 @@ import Slider from "@mui/material/Slider";
 export default function MuiSlider() {
   const [value, setValue] = React.useState<number>(30);
 
-  const handleChange = (event: Event, newValue: number | number[]) => {
+  const handleChange = (_event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
   };
 

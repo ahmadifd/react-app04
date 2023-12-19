@@ -25,7 +25,7 @@ const Login = () => {
 
   const userRef = useRef<HTMLInputElement>(null!);
 
-  const [user, resetUser, userAttribs] = useInput("user", "");
+  const [user, userAttribs] = useInput("user", "");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [persist, setPersist] = usePersist();
@@ -34,7 +34,7 @@ const Login = () => {
   const handlePwdInput = (e: React.ChangeEvent<HTMLInputElement>) =>
     setPassword(e.target.value);
 
-  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleToggle = () =>
     setPersist((prev: boolean) => !prev);
 
   let schema = yup.object().shape({

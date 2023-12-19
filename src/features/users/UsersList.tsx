@@ -175,7 +175,7 @@ const UsersList = () => {
 
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
 
-  const [GetDataGridUsers, { isLoading, isSuccess, isError, error }] =
+  const [GetDataGridUsers, { isLoading, isError, error }] =
     useGetDataGridUsersMutation();
 
   const fetchData = async () => {
@@ -335,7 +335,7 @@ const UsersList = () => {
   );
 
   function RenderClick(props: GridRenderCellParams<any, Number>) {
-    const { hasFocus, value } = props;
+    const { value } = props;
     return (
       <>
         {/* {value} */}

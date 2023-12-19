@@ -14,7 +14,7 @@ export const MuiAccordion = () => {
   }
   return (
     <>
-      <Accordion  expanded={expanded === 'panel1'} onChange={(event, isExpanded) => handleChange(isExpanded, 'panel1')}>
+      <Accordion  expanded={expanded === 'panel1'} onChange={(_event, isExpanded) => handleChange(isExpanded, 'panel1')}>
         <AccordionSummary  aria-controls='panel1-content' id='panel1-header'  expandIcon={<ExpandMoreIcon />}>
           <Typography>Accordion 1</Typography>
         </AccordionSummary>
@@ -26,7 +26,7 @@ export const MuiAccordion = () => {
         </AccordionDetails>
       </Accordion>
 
-      <Accordion expanded={expanded === 'panel2'}  onChange={(event, isExpanded) => handleChange(isExpanded, 'panel2')}>
+      <Accordion expanded={expanded === 'panel2'}  onChange={(_event, isExpanded) => handleChange(isExpanded, 'panel2')}>
         <AccordionSummary aria-controls='panel2-content' id='panel2-header' expandIcon={<ExpandMoreIcon />}>
           <Typography>Accordion 2</Typography>
         </AccordionSummary>
@@ -38,7 +38,7 @@ export const MuiAccordion = () => {
         </AccordionDetails>
       </Accordion>
 
-      <Accordion expanded={expanded === 'panel3'} onChange={(event, isExpanded) => handleChange(isExpanded, 'panel3')}>
+      <Accordion expanded={expanded === 'panel3'} onChange={(_event, isExpanded) => handleChange(isExpanded, 'panel3')}>
         <AccordionSummary aria-controls='panel3-content' id='panel3-header' expandIcon={<ExpandMoreIcon />}>
           <Typography>Accordion 3</Typography>
         </AccordionSummary>

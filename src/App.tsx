@@ -129,8 +129,7 @@ function App() {
         <Route path="pie" element={<MuiPieChart />} />
         <Route path="scatter" element={<MuiScatterChart />} />
         <Route path="datagrid" element={<MuiDataGrid />} />
-        <Route path="usergrid" element={<UserDataGrid />} />
-        /////////////////////////////////////////////////////////////////////////////////
+         /////////////////////////////////////////////////////////////////////////////////
         <Route element={<PersistLogin />}>
           <Route
             element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}

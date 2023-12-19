@@ -1,4 +1,4 @@
-import { Stack, Rating } from "@mui/material";
+import { Rating } from "@mui/material";
 import { useState } from "react";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";

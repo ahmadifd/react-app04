@@ -1,5 +1,4 @@
 import { Button } from "@mui/material";
-import { useEffect, useState } from "react";
 
 const useTest1 = () => {
   let y1 = 10;
