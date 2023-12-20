@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const Public = () => {
   const content = (
     <>
-      <Stack direction="column" mx={5}>
+      <Stack direction="column" mx={1}>
         <Stack>
           <Typography>Public-Header</Typography>
         </Stack>

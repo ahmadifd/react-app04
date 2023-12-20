@@ -8,7 +8,8 @@ import { setCredentials } from "../../features/auth/authSlice";
 import { RootState } from "../store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "https://node-app02.onrender.com",
+  baseUrl: "http://localhost:3500/", 
+  //"https://node-app02.onrender.com",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
@@ -28,8 +29,9 @@ const baseQueryWithReauth = async (
   let result = await baseQuery(args, api, extraOptions);
 
   if (result?.error?.status === 403) {
+    console.log("sending refresh token");
     const refreshResult = await baseQuery("/auth/refresh", api, extraOptions);
-
+    console.log(refreshResult);
     if (refreshResult?.data) {
       api.dispatch(
         setCredentials({
@@ -40,6 +42,7 @@ const baseQueryWithReauth = async (
       result = await baseQuery(args, api, extraOptions);
     } else {
       if (refreshResult?.error?.status === 403) {
+        //api.dispatch(logOut())
         refreshResult.error.data = { message: "Your login has expired." };
       }
       return refreshResult;

@@ -53,6 +53,13 @@ enum FilterType {
   isEmpty = "isEmpty",
   isNotEmpty = "isNotEmpty",
   isAnyOf = "isAnyOf",
+  is = "is",
+  eq = "=",
+  ne = "!=",
+  gt = ">",
+  gte = ">=",
+  lt = "<",
+  lte = "<=",
 }
 interface KeyValue {
   key: keyof UserType;
@@ -70,10 +77,7 @@ function CustomPagination(props: any) {
 }
 
 const getPageCount = (rowCount: number, pageSize: number): number => {
-  if (pageSize > 0 && rowCount > 0) {
-    return Math.ceil(rowCount / pageSize);
-  }
-
+  if (pageSize > 0 && rowCount > 0) return Math.ceil(rowCount / pageSize);
   return 0;
 };
 
@@ -239,21 +243,21 @@ const UsersList = () => {
       width: 100,
       type: "number",
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "firstname",
       headerName: "FirstName",
       width: 100,
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "lastname",
       headerName: "LastName",
       width: 100,
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "email",
@@ -261,14 +265,14 @@ const UsersList = () => {
       width: 200,
       sortable: false,
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "username",
       headerName: "Username",
       width: 100,
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "roles",
@@ -276,7 +280,7 @@ const UsersList = () => {
       width: 100,
       sortable: false,
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "active",
@@ -284,7 +288,7 @@ const UsersList = () => {
       width: 100,
       type: "boolean",
       headerAlign: "center",
-      align:"center",
+      align: "center",
     },
     {
       field: "actions",
@@ -292,7 +296,7 @@ const UsersList = () => {
       width: 80,
       headerName: "Actions1",
       headerAlign: "center",
-      align:"center",
+      align: "center",
       getActions: (params) => [
         <GridActionsCellItem
           icon={<DeleteIcon />}
@@ -315,7 +319,7 @@ const UsersList = () => {
       filterable: false,
       sortable: false,
       headerAlign: "center",
-      align:"center",
+      align: "center",
       renderCell: RenderClick,
     },
   ];
@@ -358,7 +362,6 @@ const UsersList = () => {
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
-    console.log(filterModel);
     if (filterModel.items && filterModel.items.length > 0) {
       if (
         filterModel.items[0].operator === "isEmpty" ||
@@ -436,7 +439,6 @@ const UsersList = () => {
         onRowSelectionModelChange={(
           newRowSelectionModel: GridRowSelectionModel
         ) => {
-          console.log(newRowSelectionModel);
           setRowSelectionModel(newRowSelectionModel);
         }}
         rowSelectionModel={rowSelectionModel}

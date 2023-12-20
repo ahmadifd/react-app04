@@ -64,7 +64,6 @@ const Login = () => {
   useEffect(() => {}, [user, password]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("handleSubmit");
     e.preventDefault();
     const isValid = await validate();
     try {
@@ -100,7 +99,7 @@ const Login = () => {
 
   const content = (
     <>
-      <Stack direction="column" mx={5} my={1}>
+      <Stack direction="column" mx={1} my={1}>
         <Stack mb={1}>
           {errMsg && (
             <Alert variant="filled" severity="error">

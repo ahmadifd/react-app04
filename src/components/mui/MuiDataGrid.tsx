@@ -170,6 +170,13 @@ enum FilterType {
   isEmpty = "isEmpty",
   isNotEmpty = "isNotEmpty",
   isAnyOf = "isAnyOf",
+  is = "is",
+  eq = "=",
+  neq = "!=",
+  gt = ">",
+  gte = ">=",
+  lt = "<",
+  lte = "<=",
 }
 
 interface FilterKeyValue {
@@ -520,7 +527,7 @@ const MuiDataGrid = () => {
   );
 
   function RenderClick(props: GridRenderCellParams<any, Number>) {
-    const {  value } = props;
+    const { value } = props;
     return (
       <>
         {value}
