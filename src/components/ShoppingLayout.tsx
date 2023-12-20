@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useSendLogoutMutation } from "../features/auth/authApiSlice";
 import { Box, Stack } from "@mui/system";
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 
 const ShoppingLayout = () => {
   const navigate = useNavigate();

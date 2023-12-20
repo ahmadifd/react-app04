@@ -41,17 +41,17 @@ const UserModal: FC<IProps> = ({
   showUserModal,
   userModalTitle,
 }) => {
-  const [firstname, firstnameAttribs] = useInput("firstname", "");
-  const [lastname, lastnameAttribs] = useInput("lastname", "");
-  const [email, emailAttribs] = useInput("email", "");
-  const [username, usernameAttribs] = useInput("username", "");
-  let password = "";
-  const handlePwdInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    password = e.target.value;
+  const [, firstnameAttribs] = useInput("firstname", "");
+  const [, lastnameAttribs] = useInput("lastname", "");
+  const [, emailAttribs] = useInput("email", "");
+  const [, usernameAttribs] = useInput("username", "");
+  //let password = "";
+  const handlePwdInput = (_event: React.ChangeEvent<HTMLInputElement>) => {
+    //password = e.target.value;
   };
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  };
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  // };
   return (
     <>
       <Modal open={showUserModal}>
