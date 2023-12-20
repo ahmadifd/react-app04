@@ -61,7 +61,6 @@ const Login = () => {
     userRef.current.focus();
   }, []);
 
-  useEffect(() => {}, [user, password]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -141,7 +140,7 @@ const Login = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" variant="contained">
+              <Button type="submit" style={{textTransform: 'none'}} variant="contained">
                 Sign In
               </Button>
             </Grid>

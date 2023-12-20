@@ -17,7 +17,7 @@ const DashLayout = () => {
     <>
       <Stack direction="column" mx={1}  spacing={1}>
         <Box>
-          <Button onClick={signOut} variant="contained" color="error">
+          <Button style={{textTransform: 'none'}} onClick={signOut} variant="contained" color="error">
             Sign Out
           </Button>
         </Box>

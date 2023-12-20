@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useSendLogoutMutation } from "../features/auth/authApiSlice";
 import { Box, Stack } from "@mui/system";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 
 const ShoppingLayout = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const ShoppingLayout = () => {
           <Outlet />
         </Stack>
         <Box>
-          <Button onClick={signOut} variant="contained" color="error">
+          <Button style={{textTransform: 'none'}}  onClick={signOut} variant="contained" color="error">
             Sign Out
           </Button>
         </Box>

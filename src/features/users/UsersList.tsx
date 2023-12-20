@@ -27,9 +27,9 @@ import { Box, Button, TablePaginationProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import UserDialog from "./UserDialog";
-import DoneIcon from '@mui/icons-material/Done';
-import CloseIcon from '@mui/icons-material/Close';
+import UserModal from "./UserModal";
+import DoneIcon from "@mui/icons-material/Done";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface FilterKeyValue {
   key: keyof UserType;
@@ -122,14 +122,14 @@ interface EditToolbarProps {
   ) => void;
   setQuickSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
   quicksearch: string;
-  setShowUserDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EditToolbar = (props: EditToolbarProps) => {
-  const { setQuickSearch, quicksearch, setShowUserDialog } = props;
+  const { setQuickSearch, quicksearch, setShowUserModal } = props;
   const handleClick = () => {
     console.log("Add record");
-    setShowUserDialog(true);
+    setShowUserModal(true);
   };
 
   return (
@@ -164,7 +164,7 @@ const EditToolbar = (props: EditToolbarProps) => {
 type Row = User[][number];
 
 const UsersList = () => {
-  let userDialogTitle = "AddUser";
+  let userModalTitle = "AddUser";
   const PAGE_SIZE = 5;
   const [quicksearch, setQuickSearch] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
@@ -182,7 +182,7 @@ const UsersList = () => {
   });
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
-  const [showUserDialog, setShowUserDialog] = useState<boolean>(false);
+  const [showUserModal, setShowUserModal] = useState<boolean>(false);
 
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
 
@@ -300,7 +300,7 @@ const UsersList = () => {
     },
     // {
     //   field: "id",
-      
+
     //   headerName: "",
     //   filterable: false,
     //   sortable: false,
@@ -350,13 +350,19 @@ const UsersList = () => {
     return (
       <>
         {/* {value} */}
-        <Button size="large" startIcon={row["active"] && row["active"]===true ? <DoneIcon /> :<CloseIcon/> }
+        <Button
+          size="large"
+          startIcon={
+            row["active"] && row["active"] === true ? (
+              <DoneIcon />
+            ) : (
+              <CloseIcon />
+            )
+          }
           onClick={() => {
             console.log("clickUser", row["id"]);
           }}
-        >
-         
-        </Button>
+        ></Button>
       </>
     );
   }
@@ -419,10 +425,10 @@ const UsersList = () => {
   } else {
     content = (
       <>
-        <UserDialog
-          userDialogTitle={userDialogTitle}
-          setShowUserDialog={setShowUserDialog}
-          showUserDialog={showUserDialog}
+        <UserModal
+          userModalTitle={userModalTitle}
+          setShowUserModal={setShowUserModal}
+          showUserModal={showUserModal}
         />
         <DataGrid
           rows={datarows}
@@ -439,7 +445,7 @@ const UsersList = () => {
             toolbar: {
               quicksearch,
               setQuickSearch,
-              setShowUserDialog,
+              setShowUserModal,
               showQuickFilter: true,
             },
           }}
