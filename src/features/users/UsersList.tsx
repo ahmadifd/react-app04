@@ -27,6 +27,9 @@ import { Box, Button, TablePaginationProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import UserDialog from "./UserDialog";
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface FilterKeyValue {
   key: keyof UserType;
@@ -119,12 +122,14 @@ interface EditToolbarProps {
   ) => void;
   setQuickSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
   quicksearch: string;
+  setShowUserDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EditToolbar = (props: EditToolbarProps) => {
-  const { setQuickSearch, quicksearch } = props;
+  const { setQuickSearch, quicksearch, setShowUserDialog } = props;
   const handleClick = () => {
     console.log("Add record");
+    setShowUserDialog(true);
   };
 
   return (
@@ -159,6 +164,7 @@ const EditToolbar = (props: EditToolbarProps) => {
 type Row = User[][number];
 
 const UsersList = () => {
+  let userDialogTitle = "AddUser";
   const PAGE_SIZE = 5;
   const [quicksearch, setQuickSearch] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
@@ -176,6 +182,7 @@ const UsersList = () => {
   });
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
+  const [showUserDialog, setShowUserDialog] = useState<boolean>(false);
 
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
 
@@ -289,12 +296,22 @@ const UsersList = () => {
       type: "boolean",
       headerAlign: "center",
       align: "center",
+      renderCell: RenderClick,
     },
+    // {
+    //   field: "id",
+      
+    //   headerName: "",
+    //   filterable: false,
+    //   sortable: false,
+    //   align: "left",
+    //   renderCell: RenderClick,
+    // },
     {
       field: "actions",
       type: "actions",
       width: 80,
-      headerName: "Actions1",
+      headerName: "",
       headerAlign: "center",
       align: "center",
       getActions: (params) => [
@@ -311,16 +328,6 @@ const UsersList = () => {
           // showInMenu
         />,
       ],
-    },
-    {
-      field: "id",
-      headerName: "Actions2",
-      width: 100,
-      filterable: false,
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      renderCell: RenderClick,
     },
   ];
 
@@ -339,16 +346,16 @@ const UsersList = () => {
   );
 
   function RenderClick(props: GridRenderCellParams<any, Number>) {
-    const { value } = props;
+    const { row } = props;
     return (
       <>
         {/* {value} */}
-        <Button
+        <Button size="large" startIcon={row["active"] && row["active"]===true ? <DoneIcon /> :<CloseIcon/> }
           onClick={() => {
-            console.log("clickUser", value);
+            console.log("clickUser", row["id"]);
           }}
         >
-          Click
+         
         </Button>
       </>
     );
@@ -411,40 +418,48 @@ const UsersList = () => {
     );
   } else {
     content = (
-      <DataGrid
-        rows={datarows}
-        columns={columns}
-        pageSizeOptions={[PAGE_SIZE]}
-        rowCount={rowCountState}
-        paginationMode="server"
-        onPaginationModelChange={handlePaginationModelChange}
-        slots={{
-          pagination: CustomPagination,
-          toolbar: EditToolbar,
-        }}
-        slotProps={{
-          toolbar: {
-            quicksearch,
-            setQuickSearch,
-            showQuickFilter: true,
-          },
-        }}
-        checkboxSelection
-        paginationModel={paginationModel}
-        loading={isLoading}
-        filterMode="server"
-        onFilterModelChange={onFilterChange}
-        sortingMode="server"
-        onSortModelChange={handleSortModelChange}
-        onRowSelectionModelChange={(
-          newRowSelectionModel: GridRowSelectionModel
-        ) => {
-          setRowSelectionModel(newRowSelectionModel);
-        }}
-        rowSelectionModel={rowSelectionModel}
-        keepNonExistentRowsSelected
-        disableRowSelectionOnClick
-      />
+      <>
+        <UserDialog
+          userDialogTitle={userDialogTitle}
+          setShowUserDialog={setShowUserDialog}
+          showUserDialog={showUserDialog}
+        />
+        <DataGrid
+          rows={datarows}
+          columns={columns}
+          pageSizeOptions={[PAGE_SIZE]}
+          rowCount={rowCountState}
+          paginationMode="server"
+          onPaginationModelChange={handlePaginationModelChange}
+          slots={{
+            pagination: CustomPagination,
+            toolbar: EditToolbar,
+          }}
+          slotProps={{
+            toolbar: {
+              quicksearch,
+              setQuickSearch,
+              setShowUserDialog,
+              showQuickFilter: true,
+            },
+          }}
+          checkboxSelection
+          paginationModel={paginationModel}
+          loading={isLoading}
+          filterMode="server"
+          onFilterModelChange={onFilterChange}
+          sortingMode="server"
+          onSortModelChange={handleSortModelChange}
+          onRowSelectionModelChange={(
+            newRowSelectionModel: GridRowSelectionModel
+          ) => {
+            setRowSelectionModel(newRowSelectionModel);
+          }}
+          rowSelectionModel={rowSelectionModel}
+          keepNonExistentRowsSelected
+          disableRowSelectionOnClick
+        />
+      </>
     );
   }
   return content;
