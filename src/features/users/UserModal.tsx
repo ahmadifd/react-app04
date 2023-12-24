@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertColor,
   Button,
   Checkbox,
   FormControl,
@@ -12,10 +14,13 @@ import {
   Typography,
   colors,
 } from "@mui/material";
-import {  Stack } from "@mui/system";
-import { FC } from "react";
+import { Stack } from "@mui/system";
+import { FC, useState } from "react";
 import useInput from "../../hooks/useInput";
 import { ROLES } from "../../config/roles";
+import * as yup from "yup";
+import getError from "../../utilities/getError";
+import { useAddNewUserMutation } from "./usersApiSlice";
 
 const style = {
   position: "absolute" as "absolute",
@@ -36,30 +41,152 @@ interface IProps {
   showUserModal: boolean;
 }
 
+interface IRoleCheckBox {
+  [index: string]: boolean;
+}
+
 const UserModal: FC<IProps> = ({
   setShowUserModal,
   showUserModal,
   userModalTitle,
 }) => {
-  const [, firstnameAttribs] = useInput("firstname", "");
-  const [, lastnameAttribs] = useInput("lastname", "");
-  const [, emailAttribs] = useInput("email", "");
-  const [, usernameAttribs] = useInput("username", "");
-  //let password = "";
+  const [addUser] = useAddNewUserMutation();
+
+  const initialRolesState = Object.values(ROLES).map((item) => {
+    let c1: IRoleCheckBox = {};
+    c1[item] = false;
+    return c1;
+  });
+  const {
+    value: firstName,
+    attributeObj: firstNameAttribs,
+    reset: resetFirstName,
+  } = useInput("");
+  const {
+    value: lastName,
+    attributeObj: lastNameAttribs,
+    reset: resetLastName,
+  } = useInput<string>("");
+  const {
+    value: email,
+    attributeObj: emailAttribs,
+    reset: resetEmail,
+  } = useInput<string>("");
+  const {
+    value: userName,
+    attributeObj: userNameAttribs,
+    reset: resetUserName,
+  } = useInput<string>("");
+  const {
+    value: active,
+    reset: resetActive,
+    onChange :onChangeActive
+  } = useInput<boolean>(false);
+  const {
+    value: roles,
+    reset: resetRoles,
+    onChange : onChangeRoles,
+  } = useInput<IRoleCheckBox[]>(initialRolesState);
+
+  const arrRoles = Object.values(ROLES).filter((x, index) => roles[index][x]);
+
+  const [errors, setErrors] = useState<string[]>();
+  const [msg, setMsg] = useState<{ msgType: AlertColor; msg: string }>();
+  const [password, setPassword] = useState("");
+
+  let schema = yup.object().shape({
+    firstName: yup.string().required(),
+    lastName: yup.string().required(),
+    email: yup.string().required(),
+    userName: yup.string().required(),
+    password: yup.string().required(),
+    roles: yup.array().min(1).required(),
+  });
+
+  async function validate() {
+    try {
+      await schema.validate(
+        { firstName, lastName, email, roles: arrRoles, userName, password },
+        { abortEarly: false }
+      );
+      setErrors([]);
+      return true;
+    } catch (err) {
+      setErrors(getError(err));
+      return false;
+    }
+  }
+
   const handlePwdInput = (_event: React.ChangeEvent<HTMLInputElement>) => {
-    //password = e.target.value;
+    setPassword(_event.target.value);
   };
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  // };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const isValid = await validate();
+    try {
+      setMsg(undefined);
+      if (isValid) {
+        await addUser({
+          firstName,
+          lastName,
+          email,
+          roles: arrRoles,
+          userName,
+          password,
+          active,
+        }).unwrap();
+
+        resetFirstName();
+        resetLastName();
+        resetEmail();
+        resetUserName();
+        resetActive();
+        resetRoles();
+
+        setMsg({ msg: "New User successfully added", msgType: "success" });
+
+        // navigate("/home");
+        setPassword("");
+      }
+    } catch (error) {
+      const err = error as { status: number };
+      if (!err.status) {
+        setMsg({ msg: "No Server Response", msgType: "error" });
+      } else if (err.status === 401) {
+        setMsg({ msg: "Unauthorized", msgType: "error" });
+      } else {
+        setMsg({ msg: JSON.stringify(err), msgType: "error" });
+      }
+    } finally {
+      if (isValid) {
+        setPassword("");
+      }
+    }
+  };
+
   return (
     <>
       <Modal open={showUserModal}>
-        <Stack sx={{ ...style }}>
+        <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
           <Stack mb={2}>
             <Typography color={colors.grey[700]} fontWeight={"bold"}>
               {userModalTitle}
             </Typography>
+          </Stack>
+          <Stack mb={1}>
+            {msg && (
+              <Alert variant="filled" severity={msg.msgType}>
+                {msg.msg}
+              </Alert>
+            )}
+
+            {errors && errors.length > 0 && (
+              <Alert variant="filled" severity="error">
+                {errors.map((e, i) => {
+                  return <li key={i}>{e}</li>;
+                })}
+              </Alert>
+            )}
           </Stack>
           <Grid spacing={1} container>
             <Grid item xs={12} md={6}>
@@ -67,7 +194,7 @@ const UserModal: FC<IProps> = ({
                 fullWidth={true}
                 size="small"
                 label="FirstName"
-                {...firstnameAttribs}
+                {...firstNameAttribs}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -75,7 +202,7 @@ const UserModal: FC<IProps> = ({
                 fullWidth={true}
                 size="small"
                 label="LastName"
-                {...lastnameAttribs}
+                {...lastNameAttribs}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -91,7 +218,7 @@ const UserModal: FC<IProps> = ({
                 fullWidth={true}
                 size="small"
                 label="UserName"
-                {...usernameAttribs}
+                {...userNameAttribs}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -101,11 +228,20 @@ const UserModal: FC<IProps> = ({
                 size="small"
                 type="password"
                 label="Password"
+                value={password}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Switch size="small" />}
+                control={
+                  <Switch
+                    size="small"
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      onChangeActive(event);
+                    }}
+                    checked={active}
+                  />
+                }
                 label="Active"
               />
             </Grid>
@@ -117,7 +253,18 @@ const UserModal: FC<IProps> = ({
                     return (
                       <FormControlLabel
                         key={index}
-                        control={<Checkbox size="small" name={item} />}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name={item}
+                            onChange={(
+                              event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              onChangeRoles(event, index, item);
+                            }}
+                            checked={roles[index][item]}
+                          />
+                        }
                         label={item}
                       />
                     );
@@ -131,6 +278,8 @@ const UserModal: FC<IProps> = ({
                 <Button
                   onClick={() => {
                     setShowUserModal(false);
+                    setErrors([]);
+                    setMsg(undefined);
                   }}
                 >
                   Close

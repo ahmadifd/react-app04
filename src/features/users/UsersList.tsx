@@ -37,13 +37,13 @@ interface FilterKeyValue {
   filterType: FilterType;
 }
 interface UserType {
-  rownumber: number;
+  rowNumber: number;
   id: string;
   _id: string;
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  username: string;
+  userName: string;
   roles: string[];
   active: boolean;
 }
@@ -121,12 +121,12 @@ interface EditToolbarProps {
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel
   ) => void;
   setQuickSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
-  quicksearch: string;
+  quickSearch: string;
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EditToolbar = (props: EditToolbarProps) => {
-  const { setQuickSearch, quicksearch, setShowUserModal } = props;
+  const { setQuickSearch, quickSearch, setShowUserModal } = props;
   const handleClick = () => {
     console.log("Add record");
     setShowUserModal(true);
@@ -147,7 +147,7 @@ const EditToolbar = (props: EditToolbarProps) => {
       <GridToolbarQuickFilter
         quickFilterParser={(searchInput: string) => {
           if (!searchInput || searchInput.trim() === "") {
-            if (quicksearch) setQuickSearch(undefined);
+            if (quickSearch) setQuickSearch(undefined);
           } else {
             setQuickSearch(searchInput.trim());
           }
@@ -166,16 +166,16 @@ type Row = User[][number];
 const UsersList = () => {
   let userModalTitle = "AddUser";
   const PAGE_SIZE = 5;
-  const [quicksearch, setQuickSearch] = useState<string | undefined>(undefined);
+  const [quickSearch, setQuickSearch] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
   const [sort, setSort] = useState<KeyValue | undefined>(undefined);
-  const [pageInfo, setpageInfo] = useState<PageInfo>({});
+  const [pageInfo, setPageInfo] = useState<PageInfo>({});
   const [rowCountState, setRowCountState] = useState(
     pageInfo?.totalRowCount || 0
   );
-  const [datarows, setDatarows] = useState<User[]>([]);
+  const [dataRows, setDataRows] = useState<User[]>([]);
   const [next, setNext] = useState<number>();
-  const [totalcount, setTotalcount] = useState<number>();
+  const [totalCount, setTotalCount] = useState<number>();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
@@ -191,11 +191,11 @@ const UsersList = () => {
 
   const fetchData = async () => {
     const result = await GetDataGridUsers({
-      pagenumber: paginationModel.page,
+      pageNumber: paginationModel.page,
       filter: filter,
       sort: sort,
-      quicksearch: quicksearch,
-      pagesize: paginationModel.pageSize,
+      quickSearch: quickSearch,
+      pageSize: paginationModel.pageSize,
     });
     const response = result as {
       data: {
@@ -207,9 +207,9 @@ const UsersList = () => {
       };
     };
     console.log(response.data.data.users);
-    setDatarows(response.data.data.users);
+    setDataRows(response.data.data.users);
     setNext(response.data.data.next);
-    setTotalcount(response.data.data.totalCount);
+    setTotalCount(response.data.data.totalCount);
   };
 
   useEffect(() => {
@@ -217,12 +217,12 @@ const UsersList = () => {
   }, []);
 
   useEffect(() => {
-    setpageInfo({
-      totalRowCount: totalcount,
+    setPageInfo({
+      totalRowCount: totalCount,
       nextCursor: next,
       pageSize: PAGE_SIZE,
     });
-  }, [datarows, next, totalcount]);
+  }, [dataRows, next, totalCount]);
 
   useEffect(() => {
     if (pageInfo?.nextCursor) {
@@ -241,11 +241,11 @@ const UsersList = () => {
 
   useEffect(() => {
     fetchData();
-  }, [quicksearch, filter, sort, paginationModel]);
+  }, [quickSearch, filter, sort, paginationModel]);
 
   const columns: GridColDef<Row>[] = [
     {
-      field: "rownumber",
+      field: "rowNumber",
       headerName: "RowNumber",
       width: 100,
       type: "number",
@@ -253,14 +253,14 @@ const UsersList = () => {
       align: "center",
     },
     {
-      field: "firstname",
+      field: "firstName",
       headerName: "FirstName",
       width: 100,
       headerAlign: "center",
       align: "center",
     },
     {
-      field: "lastname",
+      field: "lastName",
       headerName: "LastName",
       width: 100,
       headerAlign: "center",
@@ -275,8 +275,8 @@ const UsersList = () => {
       align: "center",
     },
     {
-      field: "username",
-      headerName: "Username",
+      field: "userName",
+      headerName: "UserName",
       width: 100,
       headerAlign: "center",
       align: "center",
@@ -340,6 +340,8 @@ const UsersList = () => {
 
   const editUser = useCallback(
     (id: GridRowId) => () => {
+      setShowUserModal(true);
+      userModalTitle = "EditUser";
       console.log("editUser", id);
     },
     []
@@ -371,7 +373,7 @@ const UsersList = () => {
     newPaginationModel: GridPaginationModel
   ) => {
     setPaginationModel(newPaginationModel);
-    //fetchUsers(newPaginationModel.page, filter, sort, quicksearch);
+    //fetchUsers(newPaginationModel.page, filter, sort, quickSearch);
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
@@ -388,14 +390,14 @@ const UsersList = () => {
           filterType: filterModel.items[0].operator as FilterType,
         };
         setFilter(result);
-        //(paginationModel.page, result, sort, quicksearch);
+        //(paginationModel.page, result, sort, quickSearch);
       } else if (filter) {
         setFilter(undefined);
-        //fetchUsers(paginationModel.page, undefined, sort, quicksearch);
+        //fetchUsers(paginationModel.page, undefined, sort, quickSearch);
       }
     } else if (filter) {
       setFilter(undefined);
-      //fetchUsers(paginationModel.page, undefined, sort, quicksearch);
+      //fetchUsers(paginationModel.page, undefined, sort, quickSearch);
     }
   };
 
@@ -406,10 +408,10 @@ const UsersList = () => {
         value: sortModel[0].sort!,
       };
       setSort(result);
-      //fetchUsers(paginationModel.page, filter, result, quicksearch);
+      //fetchUsers(paginationModel.page, filter, result, quickSearch);
     } else {
       setSort(undefined);
-      //fetchUsers(paginationModel.page, filter, undefined, quicksearch);
+      //fetchUsers(paginationModel.page, filter, undefined, quickSearch);
     }
   };
 
@@ -431,7 +433,7 @@ const UsersList = () => {
           showUserModal={showUserModal}
         />
         <DataGrid
-          rows={datarows}
+          rows={dataRows}
           columns={columns}
           pageSizeOptions={[PAGE_SIZE]}
           rowCount={rowCountState}
@@ -443,7 +445,7 @@ const UsersList = () => {
           }}
           slotProps={{
             toolbar: {
-              quicksearch,
+              quickSearch,
               setQuickSearch,
               setShowUserModal,
               showQuickFilter: true,

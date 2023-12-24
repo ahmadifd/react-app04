@@ -7,15 +7,15 @@ import { User } from "../../models/User";
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getDataGridUsers: builder.mutation({
-      query: ({ pagenumber, filter, sort, quicksearch, pagesize }) => ({
+      query: ({ pageNumber, filter, sort, quickSearch, pageSize }) => ({
         url: "/users",
         method: "POST",
         body: {
-          pagenumber,
+          pageNumber,
           filter,
           sort,
-          quicksearch,
-          pagesize,
+          quickSearch,
+          pageSize,
         },
       }),
       transformResponse: (responseData: {
@@ -35,9 +35,19 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         //usersAdapter.setAll(initialState, loadedUsers!);
       },
     }),
+    addNewUser: builder.mutation({
+      query: (user) => ({
+        url: "/users/addUser",
+        method: "POST",
+        body: {
+          ...user,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetDataGridUsersMutation } = usersApiSlice;
+export const { useGetDataGridUsersMutation, useAddNewUserMutation } =
+  usersApiSlice;
 
 //const selectDataGridUsersResult = usersApiSlice.endpoints.getDataGridUsers.

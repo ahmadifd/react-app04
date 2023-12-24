@@ -1,10 +1,10 @@
 export interface User {
   id: Number;
   _id: Number;
-  firstname: String;
-  lastname: String;
+  firstName: String;
+  lastName: String;
   email: String;
-  username: String;
+  userName: String;
   password: String;
   roles: String[];
   active: Boolean;

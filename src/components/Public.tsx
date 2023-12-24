@@ -10,7 +10,6 @@ const Public = () => {
           <Typography>Public-Header</Typography>
         </Stack>
         <Stack>
-          {" "}
           <Typography>Public-Main</Typography>
         </Stack>
         <Stack>

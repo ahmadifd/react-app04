@@ -26,7 +26,7 @@ const Login = () => {
 
   const userRef = useRef<HTMLInputElement>(null!);
 
-  const [user, userAttribs] = useInput("user", "");
+  const { value: user, attributeObj: userAttribs } = useInput("");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [persist, setPersist] = usePersist();
@@ -38,20 +38,20 @@ const Login = () => {
   const handleToggle = () => setPersist((prev: boolean) => !prev);
 
   let schema = yup.object().shape({
-    username: yup.string().required(),
+    userName: yup.string().required(),
     password: yup.string().required(),
   });
 
   async function validate() {
     try {
       await schema.validate(
-        { username: user, password },
+        { userName: user, password },
         { abortEarly: false }
       );
       setErrors([]);
       return true;
     } catch (err) {
-      console.log(user,password,err);
+      console.log(user, password, err);
       setErrors(getError(err));
       return false;
     }
@@ -60,7 +60,6 @@ const Login = () => {
   useEffect(() => {
     userRef.current.focus();
   }, []);
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,7 +70,7 @@ const Login = () => {
         const {
           data: { accessToken },
         } = await login({
-          username: user,
+          userName: user,
           password,
         }).unwrap();
         dispatch(setCredentials({ token: accessToken }));
@@ -117,7 +116,7 @@ const Login = () => {
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container>
             <Grid mb={1} item>
-              <TextField label="Username" ref={userRef} {...userAttribs} />
+              <TextField label="userName" ref={userRef} {...userAttribs} />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -140,7 +139,11 @@ const Login = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" style={{textTransform: 'none'}} variant="contained">
+              <Button
+                type="submit"
+                style={{ textTransform: "none" }}
+                variant="contained"
+              >
                 Sign In
               </Button>
             </Grid>

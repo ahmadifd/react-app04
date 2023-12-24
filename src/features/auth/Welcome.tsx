@@ -4,13 +4,13 @@ import { Box, Stack } from "@mui/system";
 import { Typography } from "@mui/material";
 
 const Welcome = () => {
-  const { username } = useAuth();
+  const { userName } = useAuth();
 
   const content = (
     <>
       <Stack direction="column">
         <Box>
-          <Typography>Welcome {username}!</Typography>
+          <Typography>Welcome {userName}!</Typography>
         </Box>
         <Box>
           <Typography>

@@ -192,7 +192,7 @@ interface KeyValue {
 
 ///////////////////////////////////////////////////////////////////
 
-const useUsersApi = (pagesize: number) => {
+const useUsersApi = (pageSize: number) => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setisLoading] = useState<boolean>(false);
   const [next, setNext] = useState<number>();
@@ -313,12 +313,12 @@ const useUsersApi = (pagesize: number) => {
     );
 
     setTimeout(() => {
-      const fromindex = pagenumber * pagesize;
-      if (filterUsersData.length >= fromindex + pagesize) {
-        const result = filterUsersData.slice(fromindex, fromindex + pagesize);
+      const fromindex = pagenumber * pageSize;
+      if (filterUsersData.length >= fromindex + pageSize) {
+        const result = filterUsersData.slice(fromindex, fromindex + pageSize);
         setUsers(result);
 
-        const nextCursor = filterUsersData[fromindex + pagesize];
+        const nextCursor = filterUsersData[fromindex + pageSize];
         if (nextCursor) {
           setNext(nextCursor.id);
         }

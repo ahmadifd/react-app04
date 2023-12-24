@@ -8,8 +8,8 @@ import { setCredentials } from "../../features/auth/authSlice";
 import { RootState } from "../store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: //"http://localhost:3500/", 
-  "https://node-app02.onrender.com",
+  baseUrl: "http://localhost:3500/", 
+  //"https://node-app02.onrender.com",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
