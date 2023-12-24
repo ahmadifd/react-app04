@@ -123,13 +123,16 @@ interface EditToolbarProps {
   setQuickSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
   quickSearch: string;
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setUserModalTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const EditToolbar = (props: EditToolbarProps) => {
-  const { setQuickSearch, quickSearch, setShowUserModal } = props;
+  const { setQuickSearch, quickSearch, setShowUserModal, setUserModalTitle } =
+    props;
   const handleClick = () => {
     console.log("Add record");
     setShowUserModal(true);
+    setUserModalTitle("AddUser");
   };
 
   return (
@@ -164,7 +167,6 @@ const EditToolbar = (props: EditToolbarProps) => {
 type Row = User[][number];
 
 const UsersList = () => {
-  let userModalTitle = "AddUser";
   const PAGE_SIZE = 5;
   const [quickSearch, setQuickSearch] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
@@ -183,7 +185,8 @@ const UsersList = () => {
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
   const [showUserModal, setShowUserModal] = useState<boolean>(false);
-
+  const [userModalTitle, setUserModalTitle] = useState<string>("AddUser");
+  const [editId, setEditId] = useState<string>("");
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
 
   const [GetDataGridUsers, { isLoading, isError, error }] =
@@ -341,8 +344,8 @@ const UsersList = () => {
   const editUser = useCallback(
     (id: GridRowId) => () => {
       setShowUserModal(true);
-      userModalTitle = "EditUser";
-      console.log("editUser", id);
+      setUserModalTitle("EditUser");
+      setEditId(id.toString());
     },
     []
   );
@@ -431,6 +434,7 @@ const UsersList = () => {
           userModalTitle={userModalTitle}
           setShowUserModal={setShowUserModal}
           showUserModal={showUserModal}
+          editId={editId}
         />
         <DataGrid
           rows={dataRows}
@@ -448,6 +452,7 @@ const UsersList = () => {
               quickSearch,
               setQuickSearch,
               setShowUserModal,
+              setUserModalTitle,
               showQuickFilter: true,
             },
           }}

@@ -15,12 +15,12 @@ import {
   colors,
 } from "@mui/material";
 import { Stack } from "@mui/system";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import useInput from "../../hooks/useInput";
 import { ROLES } from "../../config/roles";
 import * as yup from "yup";
 import getError from "../../utilities/getError";
-import { useAddNewUserMutation } from "./usersApiSlice";
+import { useAddNewUserMutation, useGetUserQuery } from "./usersApiSlice";
 
 const style = {
   position: "absolute" as "absolute",
@@ -39,6 +39,7 @@ interface IProps {
   userModalTitle: string;
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
   showUserModal: boolean;
+  editId: string;
 }
 
 interface IRoleCheckBox {
@@ -49,8 +50,13 @@ const UserModal: FC<IProps> = ({
   setShowUserModal,
   showUserModal,
   userModalTitle,
+  editId,
 }) => {
   const [addUser] = useAddNewUserMutation();
+
+  const test = () => {
+    const { data } = useGetUserQuery({ id: editId });
+  };
 
   const initialRolesState = Object.values(ROLES).map((item) => {
     let c1: IRoleCheckBox = {};
@@ -80,12 +86,12 @@ const UserModal: FC<IProps> = ({
   const {
     value: active,
     reset: resetActive,
-    onChange :onChangeActive
+    onChange: onChangeActive,
   } = useInput<boolean>(false);
   const {
     value: roles,
     reset: resetRoles,
-    onChange : onChangeRoles,
+    onChange: onChangeRoles,
   } = useInput<IRoleCheckBox[]>(initialRolesState);
 
   const arrRoles = Object.values(ROLES).filter((x, index) => roles[index][x]);
@@ -93,6 +99,14 @@ const UserModal: FC<IProps> = ({
   const [errors, setErrors] = useState<string[]>();
   const [msg, setMsg] = useState<{ msgType: AlertColor; msg: string }>();
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    console.log("UserModal", editId);
+  }, [editId]);
+
+  // useEffect(() => {
+  //   test();
+  // }, [data]);
 
   let schema = yup.object().shape({
     firstName: yup.string().required(),
