@@ -1,12 +1,12 @@
 export interface User {
-  id: Number;
-  _id: Number;
-  firstName: String;
-  lastName: String;
-  email: String;
-  userName: String;
-  password: String;
-  roles: String[];
-  active: Boolean;
-  refreshToken: String;
+  id: number;
+  _id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  userName: string;
+  password: string;
+  roles: string[];
+  active: boolean;
+  refreshToken: string;
 }

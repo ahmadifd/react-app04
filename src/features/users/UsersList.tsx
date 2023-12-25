@@ -124,15 +124,22 @@ interface EditToolbarProps {
   quickSearch: string;
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
   setUserModalTitle: React.Dispatch<React.SetStateAction<string>>;
+  setEditId: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const EditToolbar = (props: EditToolbarProps) => {
-  const { setQuickSearch, quickSearch, setShowUserModal, setUserModalTitle } =
-    props;
+  const {
+    setQuickSearch,
+    quickSearch,
+    setShowUserModal,
+    setUserModalTitle,
+    setEditId,
+  } = props;
   const handleClick = () => {
     console.log("Add record");
     setShowUserModal(true);
     setUserModalTitle("AddUser");
+    //setEditId('');
   };
 
   return (
@@ -209,7 +216,7 @@ const UsersList = () => {
         };
       };
     };
-    console.log(response.data.data.users);
+    console.log("data - DataGrid :", response.data.data.users);
     setDataRows(response.data.data.users);
     setNext(response.data.data.next);
     setTotalCount(response.data.data.totalCount);
@@ -435,7 +442,9 @@ const UsersList = () => {
           setShowUserModal={setShowUserModal}
           showUserModal={showUserModal}
           editId={editId}
+          setEditId={setEditId}
         />
+
         <DataGrid
           rows={dataRows}
           columns={columns}
@@ -453,6 +462,7 @@ const UsersList = () => {
               setQuickSearch,
               setShowUserModal,
               setUserModalTitle,
+              setEditId,
               showQuickFilter: true,
             },
           }}

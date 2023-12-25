@@ -21,6 +21,7 @@ import { ROLES } from "../../config/roles";
 import * as yup from "yup";
 import getError from "../../utilities/getError";
 import { useAddNewUserMutation, useGetUserQuery } from "./usersApiSlice";
+import { User } from "../../models/User";
 
 const style = {
   position: "absolute" as "absolute",
@@ -40,6 +41,7 @@ interface IProps {
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
   showUserModal: boolean;
   editId: string;
+  setEditId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface IRoleCheckBox {
@@ -51,12 +53,11 @@ const UserModal: FC<IProps> = ({
   showUserModal,
   userModalTitle,
   editId,
+  setEditId,
 }) => {
   const [addUser] = useAddNewUserMutation();
 
-  const test = () => {
-    const { data } = useGetUserQuery({ id: editId });
-  };
+  const { data, isLoading } = useGetUserQuery({ id: editId });
 
   const initialRolesState = Object.values(ROLES).map((item) => {
     let c1: IRoleCheckBox = {};
@@ -67,31 +68,37 @@ const UserModal: FC<IProps> = ({
     value: firstName,
     attributeObj: firstNameAttribs,
     reset: resetFirstName,
+    setValue: setFirstName,
   } = useInput("");
   const {
     value: lastName,
     attributeObj: lastNameAttribs,
     reset: resetLastName,
+    setValue: setLastName,
   } = useInput<string>("");
   const {
     value: email,
     attributeObj: emailAttribs,
     reset: resetEmail,
+    setValue: setEmail,
   } = useInput<string>("");
   const {
     value: userName,
     attributeObj: userNameAttribs,
     reset: resetUserName,
+    setValue: setUserName,
   } = useInput<string>("");
   const {
     value: active,
     reset: resetActive,
     onChange: onChangeActive,
+    setValue: setActive,
   } = useInput<boolean>(false);
   const {
     value: roles,
     reset: resetRoles,
     onChange: onChangeRoles,
+    setValue: setRoles,
   } = useInput<IRoleCheckBox[]>(initialRolesState);
 
   const arrRoles = Object.values(ROLES).filter((x, index) => roles[index][x]);
@@ -101,12 +108,30 @@ const UserModal: FC<IProps> = ({
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    console.log("UserModal", editId);
+    console.log("editId changed", isLoading, data);
+    if (editId === "") {
+      resetFirstName();
+      resetLastName();
+      resetEmail();
+      resetUserName();
+      resetActive();
+      resetRoles();
+      setPassword("");
+    }
   }, [editId]);
 
-  // useEffect(() => {
-  //   test();
-  // }, [data]);
+  useEffect(() => {
+    console.log("data changed", isLoading, data);
+    if (data && editId != "") {
+      const user = data as { data: User };
+      console.log(user.data.firstName);
+      setFirstName(user.data.firstName);
+      setLastName(user.data.lastName);
+      setEmail(user.data.email);
+      setUserName(user.data.userName);
+      setActive(user.data.active);
+    }
+  }, [data]);
 
   let schema = yup.object().shape({
     firstName: yup.string().required(),
@@ -294,6 +319,10 @@ const UserModal: FC<IProps> = ({
                     setShowUserModal(false);
                     setErrors([]);
                     setMsg(undefined);
+                    if (editId && editId !== "") {
+                      console.log("23423");
+                      setEditId("");
+                    }
                   }}
                 >
                   Close
