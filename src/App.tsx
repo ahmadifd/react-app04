@@ -65,14 +65,13 @@ import MuiBarChart from "./components/mui/MuiBarChart";
 import MuiPieChart from "./components/mui/MuiPieChart";
 import MuiScatterChart from "./components/mui/MuiScatterChart";
 import MuiDataGrid from "./components/mui/MuiDataGrid";
-import Test2 from "./components/test/Test2";
+import Test3 from "./components/test/Test3";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Public />} />
-        <Route path="test" element={<Test2 />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         /////////////////////////////////////////////////////////////////////////////////
@@ -134,6 +133,7 @@ function App() {
             element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
           >
             <Route element={<Prefetch />}>
+            <Route path="test" element={<Test3 />} />
               <Route path="home" element={<Home />} />
 
               <Route path="shopping" element={<ShoppingLayout />}>

@@ -52,5 +52,6 @@ const baseQueryWithReauth = async (
 
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
+  keepUnusedDataFor: 5,
   endpoints: () => ({}),
 });

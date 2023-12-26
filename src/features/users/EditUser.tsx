@@ -37,28 +37,26 @@ const style = {
 };
 
 interface IProps {
-  userModalTitle: string;
-  setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
-  showUserModal: boolean;
+  modalType: string;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  showModal: boolean;
   editId: string;
-  setEditId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface IRoleCheckBox {
   [index: string]: boolean;
 }
 
-const UserModal: FC<IProps> = ({
-  setShowUserModal,
-  showUserModal,
-  userModalTitle,
+const EditUser: FC<IProps> = ({
+  setShowModal,
+  showModal,
+  modalType,
   editId,
-  setEditId,
 }) => {
   const [addUser] = useAddNewUserMutation();
 
   const { data, isLoading } = useGetUserQuery({ id: editId });
-  console.log("UserModal",editId,isLoading,data);
+  console.log("EditUser", isLoading, editId);
 
   const initialRolesState = Object.values(ROLES).map((item) => {
     let c1: IRoleCheckBox = {};
@@ -109,39 +107,32 @@ const UserModal: FC<IProps> = ({
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    //console.log("editId changed", isLoading, data);
-    if (editId === "") {
-      resetFirstName();
-      resetLastName();
-      resetEmail();
-      resetUserName();
-      resetActive();
-      resetRoles();
-      setPassword("");
-    }
-  }, [editId]);
-
-  useEffect(() => {
-    //console.log("data changed", isLoading, data);
     if (data && editId != "") {
-      //console.log("2-editId",editId);
-
       const user = data as { data: User };
-      //console.log(user.data.firstName);
       setFirstName(user.data.firstName);
       setLastName(user.data.lastName);
       setEmail(user.data.email);
       setUserName(user.data.userName);
       setActive(user.data.active);
+      const userRoles = user.data.roles;
+      let temp: IRoleCheckBox[] = [];
+      Object.values(ROLES).map((item) => {
+        let arr1: IRoleCheckBox={};
+        arr1[item] = userRoles.includes(item);
+        temp.push(arr1);;
+        setRoles(temp);
+      });
+
     }
   }, [data]);
+
+
 
   let schema = yup.object().shape({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
     email: yup.string().required(),
     userName: yup.string().required(),
-    password: yup.string().required(),
     roles: yup.array().min(1).required(),
   });
 
@@ -178,7 +169,6 @@ const UserModal: FC<IProps> = ({
           active,
         }).unwrap();
 
-        
         resetFirstName();
         resetLastName();
         resetEmail();
@@ -209,11 +199,11 @@ const UserModal: FC<IProps> = ({
 
   return (
     <>
-      <Modal open={showUserModal}>
+      <Modal open={showModal}>
         <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
           <Stack mb={2}>
             <Typography color={colors.grey[700]} fontWeight={"bold"}>
-              {userModalTitle}
+              {modalType}
             </Typography>
           </Stack>
           <Stack mb={1}>
@@ -320,14 +310,9 @@ const UserModal: FC<IProps> = ({
               <Stack direction="row" justifyContent="end">
                 <Button
                   onClick={() => {
-                    setShowUserModal(false);
+                    setShowModal(false);
                     setErrors([]);
                     setMsg(undefined);
-                    if (editId && editId !== "") {
-                      //console.log("23423");
-                      setEditId("");
-                      //console.log("3-editId",editId);
-                    }
                   }}
                 >
                   Close
@@ -348,4 +333,4 @@ const UserModal: FC<IProps> = ({
   );
 };
 
-export default UserModal;
+export default EditUser;

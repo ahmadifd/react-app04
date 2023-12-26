@@ -27,9 +27,11 @@ import { Box, Button, TablePaginationProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import UserModal from "./UserModal";
+
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
+import AddUser from "./AddUser";
+import EditUser from "./EditUser";
 
 interface FilterKeyValue {
   key: keyof UserType;
@@ -116,24 +118,17 @@ interface EditToolbarProps {
   ) => void;
   setQuickSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
   quickSearch: string;
-  setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setUserModalTitle: React.Dispatch<React.SetStateAction<string>>;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalType: React.Dispatch<React.SetStateAction<string>>;
   setEditId: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const EditToolbar = (props: EditToolbarProps) => {
-  const {
-    setQuickSearch,
-    quickSearch,
-    setShowUserModal,
-    setUserModalTitle,
-    setEditId,
-  } = props;
+  const { setQuickSearch, quickSearch, setShowModal, setModalType } = props;
   const handleClick = () => {
     console.log("Add record");
-    setShowUserModal(true);
-    setUserModalTitle("AddUser");
-    //setEditId('');
+    setShowModal(true);
+    setModalType("AddUser");
   };
 
   return (
@@ -181,10 +176,9 @@ const UsersList = () => {
   });
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
-  const [showUserModal, setShowUserModal] = useState<boolean>(false);
-  const [userModalTitle, setUserModalTitle] = useState<string>("AddUser");
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [modalType, setModalType] = useState<string>("");
   const [editId, setEditId] = useState<string>("");
-
 
   const [GetDataGridUsers, { isLoading, isError, error }] =
     useGetDataGridUsersMutation();
@@ -211,7 +205,6 @@ const UsersList = () => {
     setDataRows(response.data.data.users);
     setTotalCount(response.data.data.totalCount);
   };
-
 
   useEffect(() => {
     fetchData();
@@ -314,8 +307,8 @@ const UsersList = () => {
 
   const editUser = useCallback(
     (id: GridRowId) => () => {
-      setShowUserModal(true);
-      setUserModalTitle("EditUser");
+      setShowModal(true);
+      setModalType("EditUser");
       setEditId(id.toString());
     },
     []
@@ -399,13 +392,22 @@ const UsersList = () => {
   } else {
     content = (
       <>
-        <UserModal
-          userModalTitle={userModalTitle}
-          setShowUserModal={setShowUserModal}
-          showUserModal={showUserModal}
-          editId={editId}
-          setEditId={setEditId}
-        />
+        {showModal && modalType === "AddUser" ? (
+          <AddUser
+            modalType={modalType}
+            setShowModal={setShowModal}
+            showModal={showModal}
+          />
+        ) : showModal && modalType === "EditUser" ? (
+          <EditUser
+            modalType={modalType}
+            setShowModal={setShowModal}
+            showModal={showModal}
+            editId={editId}
+          />
+        ) : (
+          <></>
+        )}
 
         <DataGrid
           rows={dataRows}
@@ -422,8 +424,8 @@ const UsersList = () => {
             toolbar: {
               quickSearch,
               setQuickSearch,
-              setShowUserModal,
-              setUserModalTitle,
+              setShowModal,
+              setModalType,
               setEditId,
               showQuickFilter: true,
             },
