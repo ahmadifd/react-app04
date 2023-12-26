@@ -382,10 +382,8 @@ const UsersList = () => {
         value: sortModel[0].sort!,
       };
       setSort(result);
-      //fetchUsers(paginationModel.page, filter, result, quickSearch);
     } else {
       setSort(undefined);
-      //fetchUsers(paginationModel.page, filter, undefined, quickSearch);
     }
   };
 

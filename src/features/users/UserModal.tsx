@@ -58,7 +58,7 @@ const UserModal: FC<IProps> = ({
   const [addUser] = useAddNewUserMutation();
 
   const { data, isLoading } = useGetUserQuery({ id: editId });
-  //console.log("1-editId",editId);
+  console.log("UserModal",editId,isLoading,data);
 
   const initialRolesState = Object.values(ROLES).map((item) => {
     let c1: IRoleCheckBox = {};
@@ -178,17 +178,18 @@ const UserModal: FC<IProps> = ({
           active,
         }).unwrap();
 
+        
         resetFirstName();
         resetLastName();
         resetEmail();
         resetUserName();
         resetActive();
         resetRoles();
+        setPassword("");
 
         setMsg({ msg: "New User successfully added", msgType: "success" });
 
         // navigate("/home");
-        setPassword("");
       }
     } catch (error) {
       const err = error as { status: number };
