@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+ 
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
@@ -15,5 +15,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </Routes>
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>
+  
 );
+
+
+

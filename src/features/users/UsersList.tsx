@@ -69,12 +69,6 @@ interface KeyValue {
   value: string;
 }
 
-interface PageInfo {
-  totalRowCount?: number;
-  nextCursor?: number;
-  pageSize?: number;
-}
-
 function CustomPagination(props: any) {
   return <GridPagination ActionsComponent={Pagination} {...props} />;
 }
@@ -178,13 +172,9 @@ const UsersList = () => {
   const [quickSearch, setQuickSearch] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
   const [sort, setSort] = useState<KeyValue | undefined>(undefined);
-  const [pageInfo, setPageInfo] = useState<PageInfo>({});
-  const [rowCountState, setRowCountState] = useState(
-    pageInfo?.totalRowCount || 0
-  );
+
   const [dataRows, setDataRows] = useState<User[]>([]);
-  const [next, setNext] = useState<number>();
-  const [totalCount, setTotalCount] = useState<number>();
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
@@ -194,10 +184,11 @@ const UsersList = () => {
   const [showUserModal, setShowUserModal] = useState<boolean>(false);
   const [userModalTitle, setUserModalTitle] = useState<string>("AddUser");
   const [editId, setEditId] = useState<string>("");
-  const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
+
 
   const [GetDataGridUsers, { isLoading, isError, error }] =
     useGetDataGridUsersMutation();
+  console.log("UsersList", isLoading);
 
   const fetchData = async () => {
     const result = await GetDataGridUsers({
@@ -211,43 +202,16 @@ const UsersList = () => {
       data: {
         data: {
           totalCount: number;
-          next: number;
           users: User[];
         };
       };
     };
+
     console.log("data - DataGrid :", response.data.data.users);
     setDataRows(response.data.data.users);
-    setNext(response.data.data.next);
     setTotalCount(response.data.data.totalCount);
   };
 
-  useEffect(() => {
-    //fetchData();
-  }, []);
-
-  useEffect(() => {
-    setPageInfo({
-      totalRowCount: totalCount,
-      nextCursor: next,
-      pageSize: PAGE_SIZE,
-    });
-  }, [dataRows, next, totalCount]);
-
-  useEffect(() => {
-    if (pageInfo?.nextCursor) {
-      // We add nextCursor when available
-      mapPageToNextCursor.current[paginationModel.page] = pageInfo?.nextCursor;
-    }
-  }, [paginationModel.page, pageInfo?.nextCursor]);
-
-  useEffect(() => {
-    setRowCountState((prevRowCountState) =>
-      pageInfo?.totalRowCount !== undefined
-        ? pageInfo?.totalRowCount
-        : prevRowCountState
-    );
-  }, [pageInfo?.totalRowCount, setRowCountState]);
 
   useEffect(() => {
     fetchData();
@@ -449,7 +413,7 @@ const UsersList = () => {
           rows={dataRows}
           columns={columns}
           pageSizeOptions={[PAGE_SIZE]}
-          rowCount={rowCountState}
+          rowCount={totalCount}
           paginationMode="server"
           onPaginationModelChange={handlePaginationModelChange}
           slots={{

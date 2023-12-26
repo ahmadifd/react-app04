@@ -58,6 +58,7 @@ const UserModal: FC<IProps> = ({
   const [addUser] = useAddNewUserMutation();
 
   const { data, isLoading } = useGetUserQuery({ id: editId });
+  //console.log("1-editId",editId);
 
   const initialRolesState = Object.values(ROLES).map((item) => {
     let c1: IRoleCheckBox = {};
@@ -108,7 +109,7 @@ const UserModal: FC<IProps> = ({
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    console.log("editId changed", isLoading, data);
+    //console.log("editId changed", isLoading, data);
     if (editId === "") {
       resetFirstName();
       resetLastName();
@@ -121,10 +122,12 @@ const UserModal: FC<IProps> = ({
   }, [editId]);
 
   useEffect(() => {
-    console.log("data changed", isLoading, data);
+    //console.log("data changed", isLoading, data);
     if (data && editId != "") {
+      //console.log("2-editId",editId);
+
       const user = data as { data: User };
-      console.log(user.data.firstName);
+      //console.log(user.data.firstName);
       setFirstName(user.data.firstName);
       setLastName(user.data.lastName);
       setEmail(user.data.email);
@@ -320,8 +323,9 @@ const UserModal: FC<IProps> = ({
                     setErrors([]);
                     setMsg(undefined);
                     if (editId && editId !== "") {
-                      console.log("23423");
+                      //console.log("23423");
                       setEditId("");
+                      //console.log("3-editId",editId);
                     }
                   }}
                 >

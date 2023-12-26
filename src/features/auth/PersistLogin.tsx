@@ -2,18 +2,21 @@ import { Link, Outlet } from "react-router-dom";
 import usePersist from "../../hooks/usePersist";
 import { useAppSelector } from "../../app/store";
 import { selectCurrentToken } from "./authSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRefreshMutation } from "./authApiSlice";
 
 const PersistLogin = () => {
   const [persist] = usePersist();
   const token = useAppSelector(selectCurrentToken);
+  const [trueSuccess, setTrueSuccess] = useState(false)
+
   const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] =
     useRefreshMutation();
 
   useEffect(() => {
     const verifyRefreshToken = async () => {
       await refresh(null);
+      setTrueSuccess(true)
     };
 
     if (!token && persist) verifyRefreshToken();
@@ -33,7 +36,7 @@ const PersistLogin = () => {
         </div>
       </div>
     );
-  } else if (isSuccess) {
+  } else if (isSuccess  && trueSuccess) {
     content = <Outlet />;
   } else if (token && isUninitialized) {
     content = <Outlet />;
