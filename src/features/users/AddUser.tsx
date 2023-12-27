@@ -21,6 +21,7 @@ import { ROLES } from "../../config/roles";
 import * as yup from "yup";
 import getError from "../../utilities/getError";
 import { useAddNewUserMutation } from "./usersApiSlice";
+import { LoadingButton } from "@mui/lab";
 
 const style = {
   position: "absolute" as "absolute",
@@ -52,7 +53,7 @@ const AddUser: FC<IProps> = ({
   showModal,
   modalType,
 }) => {
-  const [addUser] = useAddNewUserMutation();
+  const [addUser, { isLoading }] = useAddNewUserMutation();
 
   console.log("AddUser");
 
@@ -151,7 +152,7 @@ const AddUser: FC<IProps> = ({
         setMsg({ msg: "New User successfully added", msgType: "success" });
 
         fetchData();
-        
+
         // navigate("/home");
       }
     } catch (error) {
@@ -290,13 +291,14 @@ const AddUser: FC<IProps> = ({
                 >
                   Close
                 </Button>
-                <Button
+                <LoadingButton
+                  loading={isLoading}
                   type="submit"
                   style={{ textTransform: "none" }}
                   variant="contained"
                 >
                   Confirm
-                </Button>
+                </LoadingButton>
               </Stack>
             </Grid>
           </Grid>
