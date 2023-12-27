@@ -1,5 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useGetDataGridUsersMutation } from "./usersApiSlice";
+import { useCallback, useEffect,  useState } from "react";
+import {
+  useChangeActiveFieldForUserMutation,
+  useDeleteUserMutation,
+  useGetDataGridUsersMutation,
+} from "./usersApiSlice";
 import { User } from "../../models/User";
 import {
   DataGrid,
@@ -23,7 +27,13 @@ import {
   useGridSelector,
 } from "@mui/x-data-grid";
 import MuiPagination from "@mui/material/Pagination";
-import { Box, Button, TablePaginationProps } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Snackbar,
+  TablePaginationProps,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -167,21 +177,27 @@ const UsersList = () => {
   const [quickSearch, setQuickSearch] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterKeyValue | undefined>(undefined);
   const [sort, setSort] = useState<KeyValue | undefined>(undefined);
-
-  const [dataRows, setDataRows] = useState<User[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
   });
+
+  const [dataRows, setDataRows] = useState<User[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [modalType, setModalType] = useState<string>("");
   const [editId, setEditId] = useState<string>("");
+  const [alertMsg, setAlertMsg] = useState<string>("");
 
   const [GetDataGridUsers, { isLoading, isError, error }] =
     useGetDataGridUsersMutation();
+  const [removeUser] = useDeleteUserMutation();
+  const [changeActiveFieldForUser] = useChangeActiveFieldForUserMutation();
+
   console.log("UsersList", isLoading);
 
   const fetchData = async () => {
@@ -298,12 +314,18 @@ const UsersList = () => {
     },
   ];
 
-  const deleteUser = useCallback(
-    (id: GridRowId) => () => {
-      console.log("deleteUser", id);
-    },
-    []
-  );
+  const deleteUser = (id: GridRowId) => async () => {
+    const result = await removeUser({ id });
+    const message = (result as { data: { message: string } }).data.message;
+
+    setAlertMsg(message);
+    setShowModal(true);
+
+    fetchData();
+
+    setModalType("DeleteUser");
+    console.log("deleteUser", id);
+  };
 
   const editUser = useCallback(
     (id: GridRowId) => () => {
@@ -328,7 +350,21 @@ const UsersList = () => {
               <CloseIcon />
             )
           }
-          onClick={() => {
+          onClick={async () => {
+            const result = await changeActiveFieldForUser({
+              id: row["id"],
+              active: !row["active"],
+            });
+            const message = (result as { data: { message: string } }).data
+              .message;
+
+            setAlertMsg(message);
+            setShowModal(true);
+
+            fetchData();
+
+            setModalType("ChangeUser");
+
             console.log("clickUser", row["id"]);
           }}
         ></Button>
@@ -340,7 +376,6 @@ const UsersList = () => {
     newPaginationModel: GridPaginationModel
   ) => {
     setPaginationModel(newPaginationModel);
-    //fetchUsers(newPaginationModel.page, filter, sort, quickSearch);
   };
 
   const onFilterChange = (filterModel: GridFilterModel) => {
@@ -357,14 +392,11 @@ const UsersList = () => {
           filterType: filterModel.items[0].operator as FilterType,
         };
         setFilter(result);
-        //(paginationModel.page, result, sort, quickSearch);
       } else if (filter) {
         setFilter(undefined);
-        //fetchUsers(paginationModel.page, undefined, sort, quickSearch);
       }
     } else if (filter) {
       setFilter(undefined);
-      //fetchUsers(paginationModel.page, undefined, sort, quickSearch);
     }
   };
 
@@ -394,17 +426,38 @@ const UsersList = () => {
       <>
         {showModal && modalType === "AddUser" ? (
           <AddUser
+            fetchData={fetchData}
             modalType={modalType}
             setShowModal={setShowModal}
             showModal={showModal}
           />
         ) : showModal && modalType === "EditUser" ? (
           <EditUser
+            fetchData={fetchData}
             modalType={modalType}
             setShowModal={setShowModal}
             showModal={showModal}
             editId={editId}
           />
+        ) : showModal &&
+          (modalType === "DeleteUser" || modalType === "ChangeUser") ? (
+          <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            onClose={() => {
+              setShowModal(false);
+            }}
+            open={showModal}
+            autoHideDuration={5000}
+          >
+            <Alert
+              onClose={() => {
+                setShowModal(false);
+              }}
+              severity="success"
+            >
+              {alertMsg}
+            </Alert>
+          </Snackbar>
         ) : (
           <></>
         )}

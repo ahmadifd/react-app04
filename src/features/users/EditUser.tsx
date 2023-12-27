@@ -20,7 +20,7 @@ import useInput from "../../hooks/useInput";
 import { ROLES } from "../../config/roles";
 import * as yup from "yup";
 import getError from "../../utilities/getError";
-import { useAddNewUserMutation, useGetUserQuery } from "./usersApiSlice";
+import { useEditUserMutation, useGetUserQuery } from "./usersApiSlice";
 import { User } from "../../models/User";
 
 const style = {
@@ -41,6 +41,7 @@ interface IProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   showModal: boolean;
   editId: string;
+  fetchData: () => void;
 }
 
 interface IRoleCheckBox {
@@ -52,10 +53,11 @@ const EditUser: FC<IProps> = ({
   showModal,
   modalType,
   editId,
+  fetchData,
 }) => {
-  const [addUser] = useAddNewUserMutation();
+  const [editUser] = useEditUserMutation();
 
-  const { data, isLoading } = useGetUserQuery({ id: editId });
+  const { data, isLoading, refetch } = useGetUserQuery({ id: editId });
   console.log("EditUser", isLoading, editId);
 
   const initialRolesState = Object.values(ROLES).map((item) => {
@@ -107,6 +109,10 @@ const EditUser: FC<IProps> = ({
   const [password, setPassword] = useState("");
 
   useEffect(() => {
+    refetch();
+  }, []);
+
+  useEffect(() => {
     if (data && editId != "") {
       const user = data as { data: User };
       setFirstName(user.data.firstName);
@@ -117,21 +123,18 @@ const EditUser: FC<IProps> = ({
       const userRoles = user.data.roles;
       let temp: IRoleCheckBox[] = [];
       Object.values(ROLES).map((item) => {
-        let arr1: IRoleCheckBox={};
+        let arr1: IRoleCheckBox = {};
         arr1[item] = userRoles.includes(item);
-        temp.push(arr1);;
+        temp.push(arr1);
         setRoles(temp);
       });
-
     }
   }, [data]);
-
-
 
   let schema = yup.object().shape({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
-    email: yup.string().required(),
+    email: yup.string().email().required(),
     userName: yup.string().required(),
     roles: yup.array().min(1).required(),
   });
@@ -159,7 +162,8 @@ const EditUser: FC<IProps> = ({
     try {
       setMsg(undefined);
       if (isValid) {
-        await addUser({
+        await editUser({
+          id: editId,
           firstName,
           lastName,
           email,
@@ -177,7 +181,12 @@ const EditUser: FC<IProps> = ({
         resetRoles();
         setPassword("");
 
-        setMsg({ msg: "New User successfully added", msgType: "success" });
+        setMsg({
+          msg: "The User has successfully updated",
+          msgType: "success",
+        });
+
+        fetchData();
 
         // navigate("/home");
       }

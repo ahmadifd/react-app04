@@ -22,7 +22,6 @@ import * as yup from "yup";
 import getError from "../../utilities/getError";
 import { useAddNewUserMutation } from "./usersApiSlice";
 
-
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -40,6 +39,7 @@ interface IProps {
   modalType: string;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   showModal: boolean;
+  fetchData: () => void;
 }
 
 interface IRoleCheckBox {
@@ -47,6 +47,7 @@ interface IRoleCheckBox {
 }
 
 const AddUser: FC<IProps> = ({
+  fetchData,
   setShowModal,
   showModal,
   modalType,
@@ -64,37 +65,31 @@ const AddUser: FC<IProps> = ({
     value: firstName,
     attributeObj: firstNameAttribs,
     reset: resetFirstName,
-
   } = useInput("");
   const {
     value: lastName,
     attributeObj: lastNameAttribs,
     reset: resetLastName,
-
   } = useInput<string>("");
   const {
     value: email,
     attributeObj: emailAttribs,
     reset: resetEmail,
-
   } = useInput<string>("");
   const {
     value: userName,
     attributeObj: userNameAttribs,
     reset: resetUserName,
-
   } = useInput<string>("");
   const {
     value: active,
     reset: resetActive,
     onChange: onChangeActive,
-
   } = useInput<boolean>(false);
   const {
     value: roles,
     reset: resetRoles,
     onChange: onChangeRoles,
-
   } = useInput<IRoleCheckBox[]>(initialRolesState);
 
   const arrRoles = Object.values(ROLES).filter((x, index) => roles[index][x]);
@@ -106,7 +101,7 @@ const AddUser: FC<IProps> = ({
   let schema = yup.object().shape({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
-    email: yup.string().required(),
+    email: yup.string().email().required(),
     userName: yup.string().required(),
     password: yup.string().required(),
     roles: yup.array().min(1).required(),
@@ -155,6 +150,8 @@ const AddUser: FC<IProps> = ({
 
         setMsg({ msg: "New User successfully added", msgType: "success" });
 
+        fetchData();
+        
         // navigate("/home");
       }
     } catch (error) {
@@ -289,7 +286,6 @@ const AddUser: FC<IProps> = ({
                     setShowModal(false);
                     setErrors([]);
                     setMsg(undefined);
-                    
                   }}
                 >
                   Close

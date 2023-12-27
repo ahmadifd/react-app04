@@ -11,7 +11,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     getDataGridUsers: builder.mutation({
       query: ({ pageNumber, filter, sort, quickSearch, pageSize }) => ({
-        url: "/users",
+        url: "/users/getDataGridUsers",
         method: "POST",
         body: {
           pageNumber,
@@ -33,18 +33,41 @@ export const usersApiSlice = apiSlice.injectEndpoints({
           return user;
         });
         responseData.data.users = loadedUsers;
-        //console.log(responseData);
         return responseData;
-        //usersAdapter.setAll(initialState, loadedUsers!);
       },
     }),
     addNewUser: builder.mutation({
       query: (user) => ({
-        url: "/users/addUser",
+        url: "/users",
         method: "POST",
         body: {
           ...user,
         },
+      }),
+    }),
+    editUser: builder.mutation({
+      query: (user) => ({
+        url: `/users`,
+        method: "PATCH",
+        body: {
+          ...user,
+        },
+      }),
+    }),
+    changeActiveFieldForUser: builder.mutation({
+      query: (user) => ({
+        url: `/users/changeActiveFieldForUser`,
+        method: "PATCH",
+        body: {
+          ...user,
+        },
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: ({ id }) => ({
+        url: `/users`,
+        method: "DELETE",
+        body: { id },
       }),
     }),
   }),
@@ -54,6 +77,9 @@ export const {
   useGetDataGridUsersMutation,
   useAddNewUserMutation,
   useGetUserQuery,
+  useEditUserMutation,
+  useDeleteUserMutation,
+  useChangeActiveFieldForUserMutation,
 } = usersApiSlice;
 
 //const selectDataGridUsersResult = usersApiSlice.endpoints.getDataGridUsers.
