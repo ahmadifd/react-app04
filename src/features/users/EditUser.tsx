@@ -211,141 +211,143 @@ const EditUser: FC<IProps> = ({
   return (
     <>
       <Modal open={showModal}>
-        {isLoading ? (
-          <CircularProgress />
-        ) : (
-          <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
-            <Stack mb={2}>
-              <Typography color={colors.grey[700]} fontWeight={"bold"}>
-                {modalType}
-              </Typography>
-            </Stack>
-            <Stack mb={1}>
-              {msg && (
-                <Alert variant="filled" severity={msg.msgType}>
-                  {msg.msg}
-                </Alert>
-              )}
+        <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <Stack>
+              <Stack mb={2}>
+                <Typography color={colors.grey[700]} fontWeight={"bold"}>
+                  {modalType}
+                </Typography>
+              </Stack>
+              <Stack mb={1}>
+                {msg && (
+                  <Alert variant="filled" severity={msg.msgType}>
+                    {msg.msg}
+                  </Alert>
+                )}
 
-              {errors && errors.length > 0 && (
-                <Alert variant="filled" severity="error">
-                  {errors.map((e, i) => {
-                    return <li key={i}>{e}</li>;
-                  })}
-                </Alert>
-              )}
-            </Stack>
-            <Grid spacing={1} container>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth={true}
-                  size="small"
-                  label="FirstName"
-                  {...firstNameAttribs}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth={true}
-                  size="small"
-                  label="LastName"
-                  {...lastNameAttribs}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth={true}
-                  size="small"
-                  label="Email"
-                  {...emailAttribs}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth={true}
-                  size="small"
-                  label="UserName"
-                  {...userNameAttribs}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth={true}
-                  onChange={handlePwdInput}
-                  size="small"
-                  type="password"
-                  label="Password"
-                  value={password}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      size="small"
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>
-                      ) => {
-                        onChangeActive(event);
-                      }}
-                      checked={active}
-                    />
-                  }
-                  label="Active"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl>
-                  <FormLabel>Roles</FormLabel>
-                  <FormGroup sx={{ position: "flex", flexDirection: "row" }}>
-                    {Object.values(ROLES).map((item, index) => {
-                      return (
-                        <FormControlLabel
-                          key={index}
-                          control={
-                            <Checkbox
-                              size="small"
-                              name={item}
-                              onChange={(
-                                event: React.ChangeEvent<HTMLInputElement>
-                              ) => {
-                                onChangeRoles(event, index, item);
-                              }}
-                              checked={roles[index][item]}
-                            />
-                          }
-                          label={item}
-                        />
-                      );
+                {errors && errors.length > 0 && (
+                  <Alert variant="filled" severity="error">
+                    {errors.map((e, i) => {
+                      return <li key={i}>{e}</li>;
                     })}
-                  </FormGroup>
-                </FormControl>
-              </Grid>
+                  </Alert>
+                )}
+              </Stack>
+              <Grid spacing={1} container>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth={true}
+                    size="small"
+                    label="FirstName"
+                    {...firstNameAttribs}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth={true}
+                    size="small"
+                    label="LastName"
+                    {...lastNameAttribs}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth={true}
+                    size="small"
+                    label="Email"
+                    {...emailAttribs}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth={true}
+                    size="small"
+                    label="UserName"
+                    {...userNameAttribs}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth={true}
+                    onChange={handlePwdInput}
+                    size="small"
+                    type="password"
+                    label="Password"
+                    value={password}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        size="small"
+                        onChange={(
+                          event: React.ChangeEvent<HTMLInputElement>
+                        ) => {
+                          onChangeActive(event);
+                        }}
+                        checked={active}
+                      />
+                    }
+                    label="Active"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl>
+                    <FormLabel>Roles</FormLabel>
+                    <FormGroup sx={{ position: "flex", flexDirection: "row" }}>
+                      {Object.values(ROLES).map((item, index) => {
+                        return (
+                          <FormControlLabel
+                            key={index}
+                            control={
+                              <Checkbox
+                                size="small"
+                                name={item}
+                                onChange={(
+                                  event: React.ChangeEvent<HTMLInputElement>
+                                ) => {
+                                  onChangeRoles(event, index, item);
+                                }}
+                                checked={roles[index][item]}
+                              />
+                            }
+                            label={item}
+                          />
+                        );
+                      })}
+                    </FormGroup>
+                  </FormControl>
+                </Grid>
 
-              <Grid item xs={12}>
-                <Stack direction="row" justifyContent="end">
-                  <Button
-                    onClick={() => {
-                      setShowModal(false);
-                      setErrors([]);
-                      setMsg(undefined);
-                    }}
-                  >
-                    Close
-                  </Button>
-                  <LoadingButton
-                    loading={isEditLoading}
-                    type="submit"
-                    style={{ textTransform: "none" }}
-                    variant="contained"
-                  >
-                    Confirm
-                  </LoadingButton>
-                </Stack>
+                <Grid item xs={12}>
+                  <Stack direction="row" justifyContent="end">
+                    <Button
+                      onClick={() => {
+                        setShowModal(false);
+                        setErrors([]);
+                        setMsg(undefined);
+                      }}
+                    >
+                      Close
+                    </Button>
+                    <LoadingButton
+                      loading={isEditLoading}
+                      type="submit"
+                      style={{ textTransform: "none" }}
+                      variant="contained"
+                    >
+                      Confirm
+                    </LoadingButton>
+                  </Stack>
+                </Grid>
               </Grid>
-            </Grid>
-          </Stack>
-        )}
+            </Stack>
+          )}
+        </Stack>
       </Modal>
     </>
   );
