@@ -210,10 +210,10 @@ const EditUser: FC<IProps> = ({
 
   return (
     <>
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <Modal open={showModal}>
+      <Modal open={showModal}>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
           <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
             <Stack mb={2}>
               <Typography color={colors.grey[700]} fontWeight={"bold"}>
@@ -345,8 +345,8 @@ const EditUser: FC<IProps> = ({
               </Grid>
             </Grid>
           </Stack>
-        </Modal>
-      )}
+        )}
+      </Modal>
     </>
   );
 };
