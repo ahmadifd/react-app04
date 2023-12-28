@@ -1,4 +1,4 @@
-import { useCallback, useEffect,  useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   useChangeActiveFieldForUserMutation,
   useDeleteUserMutation,
@@ -15,6 +15,7 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridRowModesModel,
+  GridRowParams,
   GridRowSelectionModel,
   GridRowsProp,
   GridSortModel,
@@ -31,7 +32,13 @@ import {
   Alert,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Snackbar,
+  Stack,
   TablePaginationProps,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -42,6 +49,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import AddUser from "./AddUser";
 import EditUser from "./EditUser";
+import { LoadingButton } from "@mui/lab";
 
 interface FilterKeyValue {
   key: keyof UserType;
@@ -195,10 +203,10 @@ const UsersList = () => {
 
   const [GetDataGridUsers, { isLoading, isError, error }] =
     useGetDataGridUsersMutation();
-  const [removeUser] = useDeleteUserMutation();
+  const [removeUser, { isLoading: isDeleteLoading }] = useDeleteUserMutation();
   const [changeActiveFieldForUser] = useChangeActiveFieldForUserMutation();
 
-  console.log("UsersList", isLoading);
+  //console.log("UsersList", isLoading);
 
   const fetchData = async () => {
     const result = await GetDataGridUsers({
@@ -217,7 +225,7 @@ const UsersList = () => {
       };
     };
 
-    console.log("data - DataGrid :", response.data.data.users);
+    //console.log("data - DataGrid :", response.data.data.users);
     setDataRows(response.data.data.users);
     setTotalCount(response.data.data.totalCount);
   };
@@ -301,7 +309,7 @@ const UsersList = () => {
         <GridActionsCellItem
           icon={<DeleteIcon />}
           label="Delete"
-          onClick={deleteUser(params.id)}
+          onClick={deleteUser(params)}
           // showInMenu
         />,
         <GridActionsCellItem
@@ -314,16 +322,12 @@ const UsersList = () => {
     },
   ];
 
-  const deleteUser = (id: GridRowId) => async () => {
-    const result = await removeUser({ id });
-    const message = (result as { data: { message: string } }).data.message;
-
-    setAlertMsg(message);
+  const deleteUser = (props: GridRowParams<User>) => async () => {
+    const { row } = props;
+    const { id, userName } = row;
     setShowModal(true);
-
-    fetchData();
-
-    setModalType("DeleteUser");
+    setModalType(`DeleteUser ${userName}`);
+    setEditId(id);
     console.log("deleteUser", id);
   };
 
@@ -357,14 +361,10 @@ const UsersList = () => {
             });
             const message = (result as { data: { message: string } }).data
               .message;
-
             setAlertMsg(message);
             setShowModal(true);
-
             fetchData();
-
             setModalType("ChangeUser");
-
             console.log("clickUser", row["id"]);
           }}
         ></Button>
@@ -438,9 +438,9 @@ const UsersList = () => {
             setShowModal={setShowModal}
             showModal={showModal}
             editId={editId}
+            setEditId={setEditId}
           />
-        ) : showModal &&
-          (modalType === "DeleteUser" || modalType === "ChangeUser") ? (
+        ) : showModal && modalType === "ChangeUser" ? (
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             onClose={() => {
@@ -458,6 +458,42 @@ const UsersList = () => {
               {alertMsg}
             </Alert>
           </Snackbar>
+        ) : showModal && modalType.startsWith("DeleteUser") ? (
+          <Dialog open={showModal}>
+            <DialogTitle>{modalType}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Are you sure?</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Stack direction="row" justifyContent="end">
+                <Button
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditId("");
+                  }}
+                >
+                  Close
+                </Button>
+                <LoadingButton
+                  loading={isDeleteLoading}
+                  onClick={async () => {
+                    const result = await removeUser({ id: editId });
+                    const message = (result as { data: { message: string } })
+                      .data.message;
+
+                    setAlertMsg(message);
+                    fetchData();
+                    setModalType("ChangeUser");
+                    setEditId("");
+                  }}
+                  style={{ textTransform: "none" }}
+                  variant="contained"
+                >
+                  Confirm
+                </LoadingButton>
+              </Stack>
+            </DialogActions>
+          </Dialog>
         ) : (
           <></>
         )}

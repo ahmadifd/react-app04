@@ -44,6 +44,7 @@ interface IProps {
   showModal: boolean;
   editId: string;
   fetchData: () => void;
+  setEditId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface IRoleCheckBox {
@@ -56,10 +57,13 @@ const EditUser: FC<IProps> = ({
   modalType,
   editId,
   fetchData,
+  setEditId,
 }) => {
   const [editUser, { isLoading: isEditLoading }] = useEditUserMutation();
 
-  const { data, isLoading, refetch } = useGetUserQuery({ id: editId });
+  const { data, isLoading, refetch, isFetching } = useGetUserQuery({
+    id: editId,
+  });
   console.log("EditUser", isLoading, editId);
 
   const initialRolesState = Object.values(ROLES).map((item) => {
@@ -175,12 +179,12 @@ const EditUser: FC<IProps> = ({
           active,
         }).unwrap();
 
-        resetFirstName();
-        resetLastName();
-        resetEmail();
-        resetUserName();
-        resetActive();
-        resetRoles();
+        // resetFirstName();
+        // resetLastName();
+        // resetEmail();
+        // resetUserName();
+        // resetActive();
+        // resetRoles();
         setPassword("");
 
         setMsg({
@@ -212,7 +216,7 @@ const EditUser: FC<IProps> = ({
     <>
       <Modal open={showModal}>
         <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
-          {isLoading ? (
+          {isLoading || isFetching ? (
             <CircularProgress />
           ) : (
             <Stack>
@@ -328,6 +332,7 @@ const EditUser: FC<IProps> = ({
                     <Button
                       onClick={() => {
                         setShowModal(false);
+                        setEditId("");
                         setErrors([]);
                         setMsg(undefined);
                       }}
