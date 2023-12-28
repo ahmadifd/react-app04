@@ -74,36 +74,30 @@ const EditUser: FC<IProps> = ({
   const {
     value: firstName,
     attributeObj: firstNameAttribs,
-    reset: resetFirstName,
     setValue: setFirstName,
   } = useInput("");
   const {
     value: lastName,
     attributeObj: lastNameAttribs,
-    reset: resetLastName,
     setValue: setLastName,
   } = useInput<string>("");
   const {
     value: email,
     attributeObj: emailAttribs,
-    reset: resetEmail,
     setValue: setEmail,
   } = useInput<string>("");
   const {
     value: userName,
     attributeObj: userNameAttribs,
-    reset: resetUserName,
     setValue: setUserName,
   } = useInput<string>("");
   const {
     value: active,
-    reset: resetActive,
     onChange: onChangeActive,
     setValue: setActive,
   } = useInput<boolean>(false);
   const {
     value: roles,
-    reset: resetRoles,
     onChange: onChangeRoles,
     setValue: setRoles,
   } = useInput<IRoleCheckBox[]>(initialRolesState);
