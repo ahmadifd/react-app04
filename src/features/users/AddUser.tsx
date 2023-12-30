@@ -25,7 +25,7 @@ import { LoadingButton } from "@mui/lab";
 
 const style = {
   position: "absolute" as "absolute",
-   top: "25%",
+   top: "10%",
    left: "10%",
    right:"10%",
   //  transform: "translate(-50%, -50%)",
