@@ -34,7 +34,7 @@ const style = {
   px: 3,
   pb: 2,
   borderRadius: 1,
-  width: '70%',
+  width: '80%',
 };
 
 interface IProps {
