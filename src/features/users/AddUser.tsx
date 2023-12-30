@@ -25,16 +25,16 @@ import { LoadingButton } from "@mui/lab";
 
 const style = {
   position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+   top: "25%",
+   left: "10%",
+   right:"10%",
+  //  transform: "translate(-50%, -50%)",
   bgcolor: colors.grey[50], //"white",
   boxShadow: 24,
   pt: 2,
   px: 3,
   pb: 2,
   borderRadius: 1,
-  width: '80%',
 };
 
 interface IProps {
@@ -174,7 +174,7 @@ const AddUser: FC<IProps> = ({
 
   return (
     <>
-      <Modal open={showModal}>
+      <Modal  sx={{ overflow: "auto" }} open={showModal}>
         <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
           <Stack mb={2}>
             <Typography color={colors.grey[700]} fontWeight={"bold"}>
