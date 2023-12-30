@@ -25,9 +25,9 @@ import { LoadingButton } from "@mui/lab";
 
 const style = {
   position: "absolute" as "absolute",
-   top: "10%",
-   left: "10%",
-   right:"10%",
+  top: "10%",
+  left: "10%",
+  right: "10%",
   //  transform: "translate(-50%, -50%)",
   bgcolor: colors.grey[50], //"white",
   boxShadow: 24,
@@ -174,7 +174,7 @@ const AddUser: FC<IProps> = ({
 
   return (
     <>
-      <Modal  sx={{ overflow: "auto" }} open={showModal}>
+      <Modal sx={{ overflow: "auto" }} open={showModal}>
         <Stack sx={{ ...style }} component="form" onSubmit={handleSubmit}>
           <Stack mb={2}>
             <Typography color={colors.grey[700]} fontWeight={"bold"}>
@@ -184,7 +184,7 @@ const AddUser: FC<IProps> = ({
           <Stack mb={1}>
             {msg && (
               <Alert variant="filled" severity={msg.msgType}>
-                {msg.msg}
+                <Typography fontSize={11}>{msg.msg}</Typography>
               </Alert>
             )}
 
@@ -195,8 +195,8 @@ const AddUser: FC<IProps> = ({
                 variant="filled"
                 severity="error"
               >
-                <Typography fontSize={10}>
-                  <ul style={{ margin: "0", padding: "0" }}>
+                <Typography fontSize={11} >
+                  <ul style={{ margin: "0",padding:"0"}}>
                     {errors.map((e, i) => {
                       return <li key={i}>{e}</li>;
                     })}

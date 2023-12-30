@@ -27,9 +27,9 @@ import { LoadingButton } from "@mui/lab";
 
 const style = {
   position: "absolute" as "absolute",
-   top: "10%",
-   left: "10%",
-   right:"10%",
+  top: "10%",
+  left: "10%",
+  right: "10%",
   //  transform: "translate(-50%, -50%)",
   bgcolor: colors.grey[50], //"white",
   boxShadow: 24,
@@ -225,15 +225,24 @@ const EditUser: FC<IProps> = ({
               <Stack mb={1}>
                 {msg && (
                   <Alert variant="filled" severity={msg.msgType}>
-                    {msg.msg}
+                    <Typography fontSize={11}>{msg.msg}</Typography>
                   </Alert>
                 )}
 
                 {errors && errors.length > 0 && (
-                  <Alert variant="filled" severity="error">
-                    {errors.map((e, i) => {
-                      return <li key={i}>{e}</li>;
-                    })}
+                  <Alert
+                    sx={{ paddingY: "0" }}
+                    icon={false}
+                    variant="filled"
+                    severity="error"
+                  >
+                    <Typography fontSize={11}>
+                      <ul style={{ margin: "0", padding: "0" }}>
+                        {errors.map((e, i) => {
+                          return <li key={i}>{e}</li>;
+                        })}
+                      </ul>
+                    </Typography>
                   </Alert>
                 )}
               </Stack>
